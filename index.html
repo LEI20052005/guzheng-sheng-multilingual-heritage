@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>声生不息——古筝与笙的多语种数字传承计划</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="/favicon.svg">
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 思源宋体 国风字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2F4F4F',
+                        secondary: '#6B8E8E',
+                        rice: '#F5F2EB',
+                        ink: '#1A1D1D',
+                        accent: '#A67C52'
+                    },
+                    fontFamily: {
+                        song: ['"Noto Serif SC"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .card-hover {
+                transition: all 0.35s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 12px 30px rgba(47, 79, 79, 0.2);
+            }
+            .scroll-smooth {
+                scroll-behavior: smooth;
+            }
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background-color: #F5F2EB;
+        }
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F5F2EB;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6B8E8E;
+            border-radius: 4px;
+        }
+
+        /* ==========弹窗样式，沿用网站配色========== */
+        .instrument-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: rgba(0,0,0,0.65);
+            display: none;
+            overflow-y: auto;
+            padding: 1rem 0.5rem;
+        }
+        .modal-container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            background-color: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            background-color: #2F4F4F;
+            color: white;
+        }
+        .modal-close {
+            font-size: 26px;
+            cursor: pointer;
+            opacity: 0.85;
+        }
+        .modal-close:hover {
+            opacity: 1;
+        }
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-item {
+            padding:14px 18px;
+            border:none;
+            background:#fff;
+            font-size:15px;
+            color:#444;
+            cursor:pointer;
+        }
+        .tab-item.active {
+            border-bottom:3px solid #A67C52;
+            color:#2F4F4F;
+            font-weight:bold;
+        }
+        .tab-content-wrap {
+            padding:28px 32px;
+        }
+        .tab-panel {
+            display:none;
+        }
+        .tab-panel.show {
+            display:block;
+        }
+        .tab-panel h4 {
+            font-size:22px;
+            color:#2F4F4F;
+            margin-bottom:14px;
+        }
+        .tab-panel p {
+            line-height:1.8;
+            font-size:16px;
+            color:#333;
+            margin-bottom:12px;
+        }
+        .tab-panel ul {
+            padding-left:22px;
+            line-height:1.8;
+        }
+        /* 卡片点击手型 */
+        .click-card {
+            cursor:pointer;
+        }
+        /* ==========曲目音频弹窗 ========== */
+        .music-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background-color: rgba(0,0,0,0.65);
+            display: none;
+            overflow-y: auto;
+            padding:1rem 0.5rem;
+        }
+        .music-modal-wrap{
+            max-width:680px;
+            margin:3rem auto;
+            background:#fff;
+            border-radius:14px;
+            overflow:hidden;
+        }
+        .music-modal-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:16px 24px;
+            background:#2F4F4F;
+            color:white;
+        }
+        .music-modal-body{
+            padding:24px 28px;
+        }
+        audio{
+            width:100%;
+            margin:16px 0 20px;
+        }
+        @media (max-width:768px){
+            .tab-item {padding:10px 12px;font-size:14px;}
+            .tab-content-wrap {padding:18px 16px;}
+        }
+
+    </style>
+</head>
+<body class="font-song text-ink overflow-x-hidden">
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
+        <nav class="bg-primary/80 bg-blur text-white py-4 px-6 md:px-12">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+                <a href="#" class="text-[22px] md:text-[26px] font-bold tracking-wider mb-3 md:mb-0">
+                    <i class="fa-solid fa-music mr-2"></i><span data-i18n="logo">声生不息</span>
+                </a>
+                <div class="flex items-center gap-6 text-[16px] flex-wrap justify-center">
+                    <a href="#home" class="hover:text-accent transition-colors" data-i18n="nav_home">首页</a>
+                    <a href="#instrument" class="hover:text-accent transition-colors" data-i18n="nav_instrument">乐器资料库</a>
+                    <a href="#music" class="hover:text-accent transition-colors" data-i18n="nav_music">经典曲目</a>
+                    <a href="#video" class="hover:text-accent transition-colors" data-i18n="nav_video">视频展厅</a>
+                    <a href="model-show.html" target="_blank" class="hover:text-accent transition-colors" data-i18n="nav_model">建模展示</a>
+                    <button id="quizNavBtn" class="hover:text-accent transition-colors flex items-center gap-1"><i class="fa-solid fa-clapperboard"></i><span data-i18n="nav_quiz">互动答题</span></button>
+                    <a href="#about" class="hover:text-accent transition-colors" data-i18n="nav_about">项目介绍</a>
+                    <!-- 多语言切换按钮 -->
+                    <button id="langBtn" class="border border-white/60 px-3 py-1 rounded hover:bg-white/20">
+                        <span id="langText">中文</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="home" class="relative h-screen flex items-center justify-center bg-primary">
+        <div class="absolute inset-0 bg-[url('assets/images/banner.jpg')] bg-cover bg-center bg-no-repeat">
+            <div class="absolute inset-0 bg-black/45"></div>
+        </div>
+        <div class="relative z-10 text-center text-white px-6">
+            <h1 class="text-[clamp(2rem,6vw,4rem)] font-bold text-shadow mb-4 tracking-widest" data-i18n="home_title">
+                声生不息
+            </h1>
+            <h2 class="text-[clamp(1rem,2.5vw,1.6rem)] text-shadow mb-8" data-i18n="home_subtitle">
+                古筝与笙的多语种数字传承计划
+            </h2>
+            <p class="max-w-2xl mx-auto text-lg opacity-90 mb-10" data-i18n="home_desc">
+                梳理民乐源流，留存传世音律，搭建古筝与笙数字化开放资料库，让传统乐声跨越语言永续流传
+            </p>
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a href="#instrument" class="inline-block bg-accent hover:bg-[#8c6742] text-white px-8 py-3 rounded-lg transition-all text-lg" data-i18n="home_btn">
+                    进入资料库 <i class="fa-solid fa-arrow-down ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 md:px-12 max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+            <h3 class="text-[32px] text-primary font-bold mb-4" data-i18n="overview_title">项目概述</h3>
+            <div class="w-24 h-1 bg-secondary mx-auto"></div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-10 items-center">
+            <div>
+                <p class="text-lg leading-relaxed text-gray-700 mb-4" data-i18n="overview_p1">
+                    “声生不息”数字资料库聚焦古筝与笙两大中国传统乐器，系统整理乐器发展史、形制介绍、文献资料、经典乐谱与演奏影像。
+                </p>
+                <p class="text-lg leading-relaxed text-gray-700 mb-4" data-i18n="overview_p2">
+                    平台采用多语种数字化架构，面向海内外民乐爱好者，打破地域与语言壁垒，建立可持续的传统音乐数字保存、传播与共享体系。
+                </p>
+                <p class="text-lg leading-relaxed text-gray-700" data-i18n="overview_p3">
+                    资料库持续收录演奏实录、名家讲解、历史文献，打造永久在线、开放可查阅的民乐数字档案馆。
+                </p>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-secondary/20">
+                <ul class="space-y-4 text-[17px]">
+                    <li><i class="fa-solid fa-book-open text-accent mr-3"></i><span data-i18n="list1">乐器历史文献资料库</span></li>
+                    <li><i class="fa-solid fa-music text-accent mr-3"></i><span data-i18n="list2">经典曲目乐谱与赏析</span></li>
+                    <li><i class="fa-solid fa-video text-accent mr-3"></i><span data-i18n="list3">高清演奏视频展厅</span></li>
+                    <li><i class="fa-solid fa-globe text-accent mr-3"></i><span data-i18n="list4">多语言内容支持</span></li>
+                    <li><i class="fa-solid fa-database text-accent mr-3"></i><span data-i18n="list5">数字资源永久存档</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="instrument" class="py-20 px-6 md:px-12 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14">
+                <h3 class="text-[32px] text-primary font-bold mb-4">
+                    <span data-i18n="ins_title">乐器资料库</span>
+                    <small class="text-base text-gray-500" data-i18n="ins_tip">（点击卡片查看完整资料）</small>
+                </h3>
+                <div class="w-24 h-1 bg-secondary mx-auto"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="card-hover click-card rounded-xl overflow-hidden shadow-md bg-rice" data-type="guzheng">
+                    <div class="h-[320px] bg-[url('assets/images/guzheng.jpg')] bg-cover bg-center bg-no-repeat bg-secondary/20"></div>
+                    <div class="p-8">
+                        <h4 class="text-2xl font-bold text-primary mb-3">古筝 / Guzheng</h4>
+                        <p class="text-gray-700 leading-relaxed mb-5" data-i18n="guzheng_short">
+                            古筝又名汉筝，距今已有两千五百余年历史，音色清亮悠扬，是极具代表性的弹拨弦鸣乐器。历经秦汉、魏晋、唐宋不断改良，流传出大量传世名曲。
+                        </p>
+                        <div class="flex gap-3 flex-wrap">
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm" data-i18n="tag_gz1">弹拨乐器</span>
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm" data-i18n="tag_gz2">先秦起源</span>
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm" data-i18n="tag_gz3">五声音阶</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-hover click-card rounded-xl overflow-hidden shadow-md bg-rice" data-type="sheng">
+                    <div class="h-[320px] bg-[url('assets/images/sheng.jpg')] bg-cover bg-center bg-no-repeat bg-secondary/20"></div>
+                    <div class="p-8">
+                        <h4 class="text-2xl font-bold text-primary mb-3">笙 / Sheng</h4>
+                        <p class="text-gray-700 leading-relaxed mb-5" data-i18n="sheng_short">
+                            笙是中国古老的簧管乐器，早在商代甲骨文中已有记载，能够吹奏和声，是世界上最早使用自由簧的乐器。音色柔和丰满，常在民族管弦乐中担任和声声部。
+                        </p>
+                        <div class="flex gap-3 flex-wrap">
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm" data-i18n="tag_sh1">簧管乐器</span>
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm" data-i18n="tag_sh2">商代起源</span>
+                            <span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm" data-i18n="tag_sh3">和声乐器</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="music" class="py-20 px-6 md:px-12 max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+            <h3 class="text-[32px] text-primary font-bold mb-4" data-i18n="music_title">经典曲目库</h3>
+            <div class="w-24 h-1 bg-secondary mx-auto"></div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="card-hover click-card bg-white rounded-xl overflow-hidden shadow" data-music="g1">
+                <div class="h-[180px] bg-[url('assets/images/photo1.jpg')] bg-cover bg-center bg-no-repeat bg-secondary/10"></div>
+                <div class="p-5">
+                    <h5 class="font-bold text-lg mb-2" data-i18n="m_g1_title">高山流水</h5>
+                    <p class="text-sm text-gray-600 mb-3" data-i18n="m_g1_sub">古筝经典古曲</p>
+                    <span class="text-accent text-sm"><i class="fa-solid fa-headphones mr-1"></i><span data-i18n="play_view">曲目赏析</span></span>
+                </div>
+            </div>
+            <div class="card-hover click-card bg-white rounded-xl overflow-hidden shadow" data-music="g2">
+                <div class="h-[180px] bg-[url('assets/images/photo2.jpg')] bg-cover bg-center bg-no-repeat bg-secondary/10"></div>
+                <div class="p-5">
+                    <h5 class="font-bold text-lg mb-2" data-i18n="m_g2_title">广陵散</h5>
+                    <p class="text-sm text-gray-600 mb-3" data-i18n="m_g2_sub">古筝传统名曲</p>
+                    <span class="text-accent text-sm"><i class="fa-solid fa-headphones mr-1"></i><span data-i18n="play_view">曲目赏析</span></span>
+                </div>
+            </div>
+            <div class="card-hover click-card bg-white rounded-xl overflow-hidden shadow" data-music="s1">
+                <div class="h-[180px] bg-[url('assets/images/photo3.jpg')] bg-cover bg-center bg-no-repeat bg-secondary/10"></div>
+                <div class="p-5">
+                    <h5 class="font-bold text-lg mb-2" data-i18n="m_s1_title">冬猎</h5>
+                    <p class="text-sm text-gray-600 mb-3" data-i18n="m_s1_sub">笙代表曲目</p>
+                    <span class="text-accent text-sm"><i class="fa-solid fa-headphones mr-1"></i><span data-i18n="play_view">曲目赏析</span></span>
+                </div>
+            </div>
+            <div class="card-hover click-card bg-white rounded-xl overflow-hidden shadow" data-music="s2">
+                <div class="h-[180px] bg-[url('assets/images/photo4.jpg')] bg-cover bg-center bg-no-repeat bg-secondary/10"></div>
+                <div class="p-5">
+                    <h5 class="font-bold text-lg mb-2" data-i18n="m_s2_title">晋调</h5>
+                    <p class="text-sm text-gray-600 mb-3" data-i18n="m_s2_sub">笙传统乐曲</p>
+                    <span class="text-accent text-sm"><i class="fa-solid fa-headphones mr-1"></i><span data-i18n="play_view">曲目赏析</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="video" class="py-20 px-6 md:px-12 bg-primary/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14">
+                <h3 class="text-[32px] text-primary font-bold mb-4" data-i18n="video_title">演奏视频展厅</h3>
+                <div class="w-24 h-1 bg-secondary mx-auto"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                    <video controls class="w-full h-auto" poster="assets/images/music1.jpg">
+                        <source src="assets/videos/guzheng-demo.mp4" type="video/mp4">
+                        您的浏览器不支持视频播放
+                    </video>
+                    <div class="p-6">
+                        <h5 class="font-bold text-xl mb-2" data-i18n="v1_title">古筝《渔舟唱晚》</h5>
+                        <p class="text-gray-600" data-i18n="v1_desc">著名古筝演奏家周望老师演奏</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                    <video controls class="w-full h-auto" poster="assets/images/music2.jpg">
+                        <source src="assets/videos/sheng-demo.mp4" type="video/mp4">
+                        您的浏览器不支持视频播放
+                    </video>
+                    <div class="p-6">
+                        <h5 class="font-bold text-xl mb-2" data-i18n="v2_title">笙《凤凰展翅》</h5>
+                        <p class="text-gray-600" data-i18n="v2_desc">著名笙演奏家吴学伟演奏</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 px-6 md:px-12 max-w-7xl mx-auto">
+        <div class="text-center mb-14">
+            <h3 class="text-[32px] text-primary font-bold mb-4" data-i18n="about_title">关于本计划</h3>
+            <div class="w-24 h-1 bg-secondary mx-auto"></div>
+        </div>
+        <div class="bg-white rounded-xl p-8 md:p-12 shadow-md border border-secondary/10">
+            <p class="text-lg leading-relaxed text-gray-700 mb-4" data-i18n="about_p1">
+                《声生不息——古筝与笙的多语种数字传承计划》致力于数字化保存两类传统乐器相关文献、影音资源。
+            </p>
+            <p class="text-lg leading-relaxed text-gray-700 mb-4" data-i18n="about_p2">
+                资料库面向学术研究、民乐教学、大众普及开放，持续整理历史史料、演奏影像、乐谱文本。平台原生支持多语种拓展，推动中国传统器乐走向国际传播。
+            </p>
+            <p class="text-lg leading-relaxed text-gray-700" data-i18n="about_p3">
+                欢迎民乐研究者、演奏者提供珍贵资料，共建共享民乐数字宝库。
+            </p>
+        </div>
+    </section>
+
+    <!-- 乐器详情弹窗 -->
+    <div class="instrument-modal" id="instrumentModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 id="modalTitle">乐器详情</h3>
+                <span class="modal-close" id="modalClose">×</span>
+            </div>
+            <div class="tab-bar">
+                <button class="tab-item active" data-tab="intro" data-i18n-key="tab_intro">乐器简介</button>
+                <button class="tab-item" data-tab="history" data-i18n-key="tab_history">历史发展</button>
+                <button class="tab-item" data-tab="structure" data-i18n-key="tab_structure">乐器结构</button>
+                <button class="tab-item" data-tab="kind" data-i18n-key="tab_kind">乐器种类</button>
+                <button class="tab-item" data-tab="timbre" data-i18n-key="tab_timbre">音色特点</button>
+                <button class="tab-item" data-tab="master" data-i18n-key="tab_master">名家与经典曲目</button>
+            </div>
+            <div class="tab-content-wrap">
+                <div class="tab-panel show" id="tab-intro"></div>
+                <div class="tab-panel" id="tab-history"></div>
+                <div class="tab-panel" id="tab-structure"></div>
+                <div class="tab-panel" id="tab-kind"></div>
+                <div class="tab-panel" id="tab-timbre"></div>
+                <div class="tab-panel" id="tab-master"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 曲目音频弹窗 -->
+    <div class="music-modal" id="musicModal">
+        <div class="music-modal-wrap">
+            <div class="music-modal-header">
+                <h3 id="musicModalTitle">曲目</h3>
+                <span class="modal-close" id="musicModalClose">×</span>
+            </div>
+            <div class="music-modal-body">
+                <audio id="audioPlayer" controls>
+                    <source src="" type="audio/mpeg">
+                    浏览器不支持音频播放
+                </audio>
+                <div id="musicDesc"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-ink text-white py-10 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h4 class="text-xl mb-3" data-i18n="footer_title">声生不息——古筝与笙的多语种数字传承计划</h4>
+            <p class="opacity-70 mb-4" data-i18n="footer_sub">传统民乐数字化资料库 | 开放公益资源平台</p>
+            <p class="text-sm opacity-50">© 2025‑2026 声生不息项目组 版权所有</p>
+        </div>
+    </footer>
+
+    <script>
+        // ==========全局多语言字典 ==========
+        window.i18n = {
+            zh:{
+                logo:"声生不息",
+                nav_home:"首页",
+                nav_instrument:"乐器资料库",
+                nav_music:"经典曲目",
+                nav_video:"视频展厅",
+                nav_model:"建模展示",
+                nav_quiz:"互动答题",
+                nav_about:"项目介绍",
+                home_title:"声生不息",
+                home_subtitle:"古筝与笙的多语种数字传承计划",
+                home_desc:"梳理民乐源流，留存传世音律，搭建古筝与笙数字化开放资料库，让传统乐声跨越语言永续流传",
+                home_btn:"进入资料库 ⬇",
+                overview_title:"项目概述",
+                overview_p1:"“声生不息”数字资料库聚焦古筝与笙两大中国传统乐器，系统整理乐器发展史、形制介绍、文献资料、经典乐谱与演奏影像。",
+                overview_p2:"平台采用多语种数字化架构，面向海内外民乐爱好者，打破地域与语言壁垒，建立可持续的传统音乐数字保存、传播与共享体系。",
+                overview_p3:"资料库持续收录演奏实录、名家讲解、历史文献，打造永久在线、开放可查阅的民乐数字档案馆。",
+                list1:"乐器历史文献资料库",
+                list2:"经典曲目乐谱与赏析",
+                list3:"高清演奏视频展厅",
+                list4:"多语言内容支持",
+                list5:"数字资源永久存档",
+                ins_title:"乐器资料库",
+                ins_tip:"（点击卡片查看完整资料）",
+                guzheng_short:"古筝又名汉筝，距今已有两千五百余年历史，音色清亮悠扬，是极具代表性的弹拨弦鸣乐器。历经秦汉、魏晋、唐宋不断改良，流传出大量传世名曲。",
+                sheng_short:"笙是中国古老的簧管乐器，早在商代甲骨文中已有记载，能够吹奏和声，是世界上最早使用自由簧的乐器。音色柔和丰满，常在民族管弦乐中担任和声声部。",
+                tag_gz1:"弹拨乐器",tag_gz2:"先秦起源",tag_gz3:"五声音阶",
+                tag_sh1:"簧管乐器",tag_sh2:"商代起源",tag_sh3:"和声乐器",
+                music_title:"经典曲目库",
+                play_view:"曲目赏析",
+                m_g1_title:"高山流水",m_g1_sub:"古筝经典古曲",
+                m_g2_title:"广陵散",m_g2_sub:"古筝传统名曲",
+                m_s1_title:"冬猎",m_s1_sub:"笙代表曲目",
+                m_s2_title:"晋调",m_s2_sub:"笙传统乐曲",
+                video_title:"演奏视频展厅",
+                v1_title:"古筝《渔舟唱晚》",v1_desc:"著名古筝演奏家周望老师演奏",
+                v2_title:"笙《凤凰展翅》",v2_desc:"著名笙演奏家吴学伟演奏",
+                about_title:"关于本计划",
+                about_p1:"《声生不息——古筝与笙的多语种数字传承计划》致力于数字化保存两类传统乐器相关文献、影音资源。",
+                about_p2:"资料库面向学术研究、民乐教学、大众普及开放，持续整理历史史料、演奏影像、乐谱文本。平台原生支持多语种拓展，推动中国传统器乐走向国际传播。",
+                about_p3:"欢迎民乐研究者、演奏者提供珍贵资料，共建共享民乐数字宝库。",
+                footer_title:"声生不息——古筝与笙的多语种数字传承计划",
+                footer_sub:"传统民乐数字化资料库 | 开放公益资源平台",
+                tab_intro:"乐器简介",
+                tab_history:"历史发展",
+                tab_structure:"乐器结构",
+                tab_kind:"乐器种类",
+                tab_timbre:"音色特点",
+                tab_master:"名家与经典曲目"
+            },
+            en:{
+                logo:"Enduring Melodies",
+                nav_home:"Home",
+                nav_instrument:"Instrument Library",
+                nav_music:"Classic Repertoire",
+                nav_video:"Video Gallery",
+                nav_model:"3D Models",
+                nav_quiz:"Interactive Quiz",
+                nav_about:"About Project",
+                home_title:"Enduring Melodies",
+                home_subtitle:"Multilingual Digital Heritage Project of Guzheng & Sheng",
+                home_desc:"Sort out the origin of folk music, preserve musical heritage, build an open digital database for Guzheng and Sheng, and let traditional music spread across languages.",
+                home_btn:"Enter Library ⬇",
+                overview_title:"Project Overview",
+                overview_p1:"The Enduring Melodies digital archive focuses on two traditional Chinese instruments: Guzheng and Sheng. It systematically organizes their development history, forms, documents, scores and performance recordings.",
+                overview_p2:"Built with multilingual architecture for folk‑music lovers worldwide. It builds a sustainable system for digital preservation, dissemination and sharing of traditional Chinese music.",
+                overview_p3:"The archive collects performances, expert lectures and historical documents to build a permanent open‑access folk‑music digital repository.",
+                list1:"Instrument History & Documents",
+                list2:"Scores & Repertoire Appreciation",
+                list3:"High‑definition Performance Gallery",
+                list4:"Multilingual Support",
+                list5:"Permanent Digital Archiving",
+                ins_title:"Instrument Library",
+                ins_tip:"(Click card for full details)",
+                guzheng_short:"Guzheng, also known as Han‑Zheng, has a history of more than 2,500 years. It is a representative plucked‑string instrument with bright and elegant timbre. It has been continuously improved from Qin‑Han to Tang‑Song dynasties and handed down many famous pieces.",
+                sheng_short:"Sheng is an ancient Chinese free‑reed wind instrument recorded in Shang‑Dynasty oracle bone inscriptions. It can play harmony and is the world’s earliest free‑reed instrument. It often serves as harmony part in Chinese national orchestra.",
+                tag_gz1:"Plucked Instrument",tag_gz2:"Pre‑Qin Origin",tag_gz3:"Pentatonic Scale",
+                tag_sh1:"Reed‑pipe Instrument",tag_sh2:"Shang‑Dynasty Origin",tag_sh3:"Harmony Instrument",
+                music_title:"Classic Repertoire",
+                play_view:"Repertoire Info",
+                m_g1_title:"High Mountain Running Water",m_g1_sub:"Classic Guzheng Work",
+                m_g2_title:"Guangling Melody",m_g2_sub:"Traditional Guzheng Piece",
+                m_s1_title:"Winter Hunt",m_s1_sub:"Representative Sheng Work",
+                m_s2_title:"Jin Tune",m_s2_sub:"Traditional Sheng Music",
+                video_title:"Performance Video Gallery",
+                v1_title:"Guzheng ‑ Fisherman’s Song at Dusk",v1_desc:"Performed by famous Guzheng master Zhou Wang",
+                v2_title:"Sheng ‑ Phoenix Spreads Its Wings",v2_desc:"Performed by famous Sheng player Wu Xuewei",
+                about_title:"About This Project",
+                about_p1:"Enduring Melodies — Multilingual Digital Heritage Project of Guzheng & Sheng is committed to digitally preserving documents and audio‑visual resources of the two instruments.",
+                about_p2:"Open for academic research, folk‑music teaching and public audiences. It promotes Chinese instrumental music for global cross‑cultural communication.",
+                about_p3:"Researchers and performers are welcome to contribute materials to build this shared folk‑music archive.",
+                footer_title:"Enduring Melodies — Multilingual Digital Heritage Project of Guzheng & Sheng",
+                footer_sub:"Folk‑music Digital Archive | Public‑welfare Open Platform",
+                tab_intro:"Introduction",
+                tab_history:"History",
+                tab_structure:"Structure",
+                tab_kind:"Types",
+                tab_timbre:"Timbre",
+                tab_master:"Masters & Repertoire"
+            }
+        };
+
+        //乐器知识库中英
+        const instrumentData = {
+            zh:{
+                guzheng:{
+                    title:"【古筝】乐器完整资料库",
+                    intro:`
+ <h4>乐器简介</h4>
+ <p>古筝，古时也称秦筝、云筝，是中国古老弹拨弦鸣乐器，距今约两千七百余年历史，被称作“众乐之王”、“东方钢琴”。常用于独奏、重奏、器乐合奏，也可为歌舞戏曲伴奏。古筝采用五声音阶定弦，依靠右手弹弦、左手按揉滑颤来塑造音乐韵味。</p>
+ <p>《谏逐客书》中“弹筝、搏髀，而歌呼呜呜”的记载，印证战国时期秦地古筝已经广泛流行。现代通用形制为二十一弦古筝。</p>
+ `,
+                    history:`
+ <h4>历史发展</h4>
+ <ul>
+ <li><b>先秦战国：</b>早期五弦筝，形制与筑相近，江苏吴县长桥出土战国时期古筝实物。</li>
+ <li><b>汉魏晋：</b>发展为十二弦，木质共鸣箱体基本成型。</li>
+ <li><b>隋唐：</b>十二弦、十三弦并存，十三弦成为主流，向外传播至日本、朝鲜，演化出日本筝、伽倻琴。</li>
+ <li><b>宋元：</b>十三、十四弦广泛流传，宋词中留存大量咏筝文学。</li>
+ <li><b>明清：</b>十五弦、十六弦普及民间，逐步形成山东、河南、潮州、客家、浙江五大传统演奏流派。</li>
+ <li><b>新中国：</b>1957年二十一弦古筝定型，成为当代标准乐器，极大拓展演奏表现力。</li>
+ </ul>
+ <p>古筝在历代还有仁智之器、玉筝、鸣筝等雅称。</p>
+ `,
+                    structure:`
+ <h4>乐器结构</h4>
+ <p>古筝主体由泡桐木面板、底板、侧板构成共鸣箱体；核心部件包含筝首、筝尾、前岳山、后岳山、琴弦、雁柱（琴码）、出弦孔。</p>
+ <ul>
+ <li><b>面板：</b>多选用兰考泡桐木，是古筝发声核心；</li>
+ <li><b>雁柱（琴码）：</b>一弦一码，可左右移动调节音高，是古筝区别古琴最显著特征；</li>
+ <li><b>琴弦：</b>现代使用钢丝尼龙复合弦；古代使用丝弦；</li>
+ <li><b>演奏义甲：</b>演奏佩戴义甲；右手完成托抹勾打，左手在雁柱左侧完成按、滑、揉、颤，获取4、7变化音。</li>
+ </ul>
+ `,
+                    kind:`
+ <h4>乐器种类与流派</h4>
+ <p>弦制演变：五弦→十二弦→十三弦→十五、十六弦→现代二十一弦（主流），也存在23弦、29弦改良筝。</p>
+ <p>国内五大传统演奏流派：</p>
+ <ul>
+ <li>山东筝：风格铿锵明快；代表曲目《高山流水》</li>
+ <li>河南筝：热烈高亢；代表曲目《天下大同》</li>
+ <li>潮州筝：婉转细腻；代表曲目《寒鸦戏水》</li>
+ <li>客家筝：古朴深沉；代表曲目《出水莲》</li>
+ <li>浙江筝：清丽流畅；代表曲目《四合如意》</li>
+ </ul>
+ <p>域外同源变体：日本筝、朝鲜伽倻琴、越南筝。</p>
+ `,
+                    timbre:`
+ <h4>音色特点</h4>
+ <p>古筝高音清亮通透，中音温润柔美，低音浑厚绵长。音乐表现力跨度极大，既能够描摹山水写意的幽静意境，也可以演绎激昂磅礴的音乐场面。</p>
+ <p>传统审美讲究“右手取音，左手作韵”，大量韵味变化依靠左手按弦实现，是筝乐艺术的灵魂。既适合独奏，也大量运用于民族乐团弹拨声部。</p>
+ `,
+                    master:`
+ <h4>名家与经典曲目</h4>
+ <p><b>经典古曲与创作曲：</b>《高山流水》《渔舟唱晚》《汉宫秋月》《出水莲》《战台风》《四合如意》《寒鸦戏水》</p>
+ <p><b>现当代名家：</b>赵玉斋（奠定二十一弦古筝发展）、周望等。当代也诞生大量古筝协奏曲、原创器乐作品。</p>
+ <p>唐诗宋词留存大量描写古筝音乐的文学记载。</p>
+ `
+                },
+                sheng:{
+                    title:"【笙】乐器完整资料库",
+                    intro:`
+ <h4>乐器简介</h4>
+ <p>笙，属于八音之“匏”类，是拥有三千多年历史的古老簧管吹管乐器，也是世界上最早使用自由簧的乐器，对西洋口琴、手风琴、管风琴的发明具有启发意义。</p>
+ <p>商代甲骨文中的“和”指的就是小笙；《诗经·小雅·鹿鸣》“我有嘉宾，鼓瑟吹笙”记录了它在古代礼乐中的使用场景。1978年曾侯乙墓出土战国匏笙实物，距今2400余年。笙最突出特征是可以同时演奏和声，承载中国传统音乐“和”的美学思想。</p>
+ `,
+                    history:`
+ <h4>历史发展</h4>
+ <ul>
+ <li><b>商周：</b>甲骨文记载“和（小笙）”，是宫廷礼乐核心乐器，传说有女娲作笙簧的上古传说。</li>
+ <li><b>春秋战国：</b>笙与竽并行盛行，曾侯乙墓出土古匏笙，早期笙斗为天然葫芦匏制作。</li>
+ <li><b>周汉时期：</b>发展繁盛，祭祀、宴乐场合广泛使用。</li>
+ <li><b>隋唐：</b>出现13、17、19簧，义管笙；随着西域音乐传入，笙地位逐步下降，笙斗从葫芦改为木斗。</li>
+ <li><b>宋元明清：</b>宫廷衰落，流传于民间，笙斗改为铜斗，民间通行13簧、14簧、17簧。</li>
+ <li><b>新中国成立后：</b>乐器改良浪潮，诞生21、24、36、42簧加键笙，分化出高音笙、中音笙、次中音笙、低音笙，重回专业舞台。</li>
+ </ul>
+ `,
+                    structure:`
+ <h4>乐器结构</h4>
+ <p>笙三大核心构件：笙簧、笙苗（竹管）、笙斗（底座吹嘴）。</p>
+ <ul>
+ <li><b>笙斗：</b>早期葫芦匏，唐代改为木斗，现代多为铜斗，附带吹嘴，作为储气气室；</li>
+ <li><b>笙苗：</b>长短不一竹管，开设音窗、按音孔；</li>
+ <li><b>笙簧：</b>古代竹簧；现代响铜自由簧片，装配于笙管下端笙角；</li>
+ <li><b>其他部件：</b>扩音管、放水口、腰箍；改良笙增设按键传动系统。</li>
+ </ul>
+ <p>演奏特点：吹、吸都可以发声；手指闭合管孔，簧片配合管内空气柱共鸣发声。</p>
+ `,
+                    kind:`
+ <h4>乐器种类</h4>
+ <p>传统分为：北笙（圆斗，流传更广）、南笙（方斗）。</p>
+ <ul>
+ <li>传统笙：13簧、17簧、19簧，直接手指按孔；</li>
+ <li>现代改良加键笙：21簧、24簧、26簧、36簧、42簧，按键辅助扩大音域；</li>
+ <li>民族乐团声部配置：高音笙、中音笙、次中音笙、低音笙、排笙（键盘笙）。</li>
+ </ul>
+ `,
+                    timbre:`
+ <h4>音色特点</h4>
+ <p>笙高音清脆通透，中音柔和丰满，低音浑厚低沉，吹与吸气均可发声。</p>
+ <p>在中国传统乐器中为数不多原生具备和声演奏能力的乐器。民族管弦乐队中主要承担融合各个乐器声部，调和整体音响效果。音质柔和，歌唱性强，具备浓郁的民间音乐色彩。</p>
+ `,
+                    master:`
+ <h4>名家与经典曲目</h4>
+ <p><b>代表演奏家：</b>胡天泉、闫海登。</p>
+ <p><b>经典笙独奏曲：</b></p>
+ <ul>
+ <li>《凤凰展翅》：胡天泉、董洪德创作，我国第一首笙独奏曲，取材山西梆子音调。</li>
+ <li>《芦笙舞曲》（胡天泉）</li>
+ <li>《孔雀开屏》、《沂蒙山歌》（闫海登）</li>
+ </ul>
+ <p>相关古代神话典故：王子乔吹笙引凤、弄玉吹笙。</p>
+ `
+                }
+            },
+            en:{
+                guzheng:{
+                    title:"【Guzheng】Instrument Full Archive",
+                    intro:`
+<h4>Instrument Introduction</h4>
+<p>Guzheng, also called Qin‑Zheng, is an ancient Chinese plucked‑string instrument with more than 2700‑year‑old history, known as “King of Instruments” or “Oriental Piano”. It is used for solo, ensemble and opera accompaniment. Tuned in pentatonic scale. Right‑hand plucks strings; left‑hand creates charm through pressing, sliding and vibrato.</p>
+<p>Historical records prove Guzheng was popular in Warring‑States period. The modern standard instrument is 21‑string Guzheng.</p>
+`,
+                    history:`
+<h4>History Development</h4>
+<ul>
+<li><b>Pre‑Qin & Warring‑States:</b> Early 5‑string zheng.</li>
+<li><b>Han‑Wei‑Jin:</b> Developed to 12‑strings, wooden resonance box formed.</li>
+<li><b>Sui‑Tang:</b> 12‑ and 13‑string co‑exist; spread to Japan and Korea.</li>
+<li><b>Song‑Yuan:</b> 13‑14‑string widely‑used, many poems about zheng.</li>
+<li><b>Ming‑Qing:</b> 15‑16‑string popular; five major regional performing schools formed.</li>
+<li><b>Modern China:</b> 21‑string Guzheng finalized in 1957, greatly expanded expressive capacity.</li>
+</ul>
+`,
+                    structure:`
+<h4>Instrument Structure</h4>
+<p>Guzheng resonance box made of paulownia wood; main parts: head, tail, front mountain, rear mountain, strings, movable bridges, string holes.</p>
+<ul>
+<li><b>Soundboard:</b> Paulownia wood, core of sound‑production;</li>
+<li><b>Movable bridge:</b> One bridge per string for pitch adjustment, key difference from Guqin;</li>
+<li><b>Strings:</b> Modern steel‑nylon strings; ancient silk strings;</li>
+<li><b>Plectrum‑nails:</b> Right‑hand plucking, left‑hand pressing/sliding for semitones.</li>
+</ul>
+`,
+                    kind:`
+<h4>Types & Schools</h4>
+<p>Evolution:5‑string→12‑string→13‑string→15/16‑string→modern 21‑string. Improved 23‑/29‑string also exists.</p>
+<p>Five traditional performing schools: Shandong, Henan, Chaozhou, Hakka, Zhejiang.</p>
+<p>Related instruments: Japanese Koto, Korean Gayageum, Vietnamese Đàn tranh.</p>
+`,
+                    timbre:`
+<h4>Timbre Features</h4>
+<p>Bright high notes, warm mid‑range, deep thick bass. Wide dynamic range for quiet landscape imagery and powerful dramatic scenes.</p>
+<p>Aesthetic: "Right‑hand creates sound; left‑hand creates charm". Important plucked instrument in Chinese national orchestra.</p>
+`,
+                    master:`
+<h4>Masters & Repertoire</h4>
+<p><b>Classic works:</b> High‑Mountain‑Running‑Water, Fisherman‑Singing‑at‑Dusk, etc.</p>
+<p><b>Modern masters:</b> Zhao Yuzhai, Zhou Wang.</p>
+`
+                },
+                sheng:{
+                    title:"【Sheng】Instrument Full Archive",
+                    intro:`
+<h4>Instrument Introduction</h4>
+<p>Sheng is an ancient free‑reed wind instrument with more than 3000‑year history. It inspired invention of accordion and harmonica in the West.</p>
+<p>Mentioned in oracle‑bone inscriptions and Book‑of‑Songs. The Zeng‑Hou‑Yi tomb unearthed early sheng relics dating back 2400 years. Unique feature: capable of playing harmony, reflecting Chinese aesthetic of "harmony".</p>
+`,
+                    history:`
+<h4>History Development</h4>
+<ul>
+<li><b>Shang‑Zhou:</b> Used in royal ritual music.</li>
+<li><b>Spring‑Autumn & Warring‑States:</b> Sheng‑and‑Yu were popular; gourd wind‑chest.</li>
+<li><b>Han:</b> Flourished for ritual and banquet music.</li>
+<li><b>Sui‑Tang:</b>13‑17‑19‑reed; wind‑chest changed to wood.</li>
+<li><b>Song‑Yuan‑Ming‑Qing:</b> Faded in court, survived among folk; copper wind‑chest.</li>
+<li><b>New‑China:</b> Improved 21‑24‑36‑42 key‑sheng; divided into high‑/mid‑/low‑register sheng for modern orchestra.</li>
+</ul>
+`,
+                    structure:`
+<h4>Instrument Structure</h4>
+<p>Three core parts: reed, bamboo pipes, wind‑chest (blow‑pipe).</p>
+<ul>
+<li><b>Wind‑chest:</b> Originally gourd, later wood, modern copper with mouthpiece;</li>
+<li><b>Bamboo pipes:</b> Different lengths with sound‑windows and finger‑holes;</li>
+<li><b>Free‑reeds:</b> Bronze reeds mounted at bottom of pipes;</li>
+<li><b>Improved models add key‑transmission‑system.</b></li>
+</ul>
+<p>Can sound on both blow and draw air; finger‑holes control resonance.</p>
+`,
+                    kind:`
+<h4>Instrument Types</h4>
+<p>Traditional: Northern round‑container Sheng, Southern square‑container Sheng.</p>
+<ul>
+<li>Traditional:13‑17‑19‑reed finger‑hole sheng;</li>
+<li>Modern key‑added:21‑24‑36‑42‑reed;</li>
+<li>Orchestra voices:High‑pitch, Alto, Tenor, Bass, Keyboard‑Sheng(Pai‑Sheng).</li>
+</ul>
+`,
+                    timbre:`
+<h4>Timbre Features</h4>
+<p>Sheng high notes are clear and bright, mid‑range soft and full, bass deep and thick. Sounds on both blow and inhale.</p>
+<p>Rare Chinese traditional instrument with native harmony capability. In national orchestra it blends different instrument sections, soft and lyrical folk‑style sound.</p>
+`,
+                    master:`
+<h4>Masters & Repertoire</h4>
+<p><b>Representative performers:</b> Hu Tianquan, Yan Haideng.</p>
+<p><b>Famous works:</b></p>
+<ul>
+<li>Phoenix‑Spread‑Its‑Wings</li>
+<li>Dance‑of‑Reed‑Flute</li>
+<li>Peacock‑Display‑Its‑Tail, Yimeng‑Mountain‑Ballad</li>
+</ul>
+`
+                }
+            }
+        };
+
+        //曲目赏析中英
+        const musicData = {
+            zh:{
+                g1:{title:"高山流水",src:"assets/audio/gaoshanliushui.mp3",desc:`<p>《高山流水》是古筝经典古曲，寄托知音相遇的人文意象，为古筝最负盛名的代表作品。</p>`},
+                g2:{title:"广陵散",src:"assets/audio/guangling-san.mp3",desc:`<p>《广陵散》，表现聂政刺韩的悲壮历史故事，属于传统古筝大套名曲。</p>`},
+                s1:{title:"冬猎",src:"assets/audio/donglie.mp3",desc:`<p>笙曲《冬猎》，描绘北方冬日狩猎场景，节奏明快，音乐充满活力。</p>`},
+                s2:{title:"晋调",src:"assets/audio/jindiao.mp3",desc:`<p>笙传统乐曲《晋调》，取材山西民间音乐，风格质朴热烈。</p>`}
+            },
+            en:{
+                g1:{title:"High Mountain Running Water",src:"assets/audio/gaoshanliushui.mp3",desc:`<p>High‑Mountain‑Running‑Water, classic Guzheng piece, symbolizing the friendship of bosom friends.</p>`},
+                g2:{title:"Guangling Melody",src:"assets/audio/guangling-san.mp3",desc:`<p>Guangling‑San depicts the solemn historical story of Nie Zheng, a great traditional Guzheng suite.</p>`},
+                s1:{title:"Winter Hunt",src:"assets/audio/donglie.mp3",desc:`<p>Sheng piece Winter‑Hunt, depicts lively winter hunting scenes in northern China.</p>`},
+                s2:{title:"Jin Tune",src:"assets/audio/jindiao.mp3",desc:`<p>Traditional Sheng piece Jin‑Tune, adapted from folk‑music of Shanxi province.</p>`}
+            }
+        };
+
+        let currentLang = "zh";
+
+        //DOM元素
+        const navbar = document.getElementById('navbar');
+        const langBtn = document.getElementById('langBtn');
+        const langText = document.getElementById('langText');
+        const modal = document.getElementById('instrumentModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalTitle = document.getElementById('modalTitle');
+        const tabItems = document.querySelectorAll('.tab-item');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        const instrumentCards = document.querySelectorAll('.click-card[data-type]');
+
+        const musicModal = document.getElementById("musicModal");
+        const musicModalClose = document.getElementById("musicModalClose");
+        const musicModalTitle = document.getElementById("musicModalTitle");
+        const audioPlayer = document.getElementById("audioPlayer");
+        const audioSource = audioPlayer.querySelector("source");
+        const musicDescWrap = document.getElementById("musicDesc");
+        const musicCards = document.querySelectorAll('.click-card[data-music]');
+
+        //导航滚动
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 100){
+                navbar.classList.add('shadow-lg');
+            }else{
+                navbar.classList.remove('shadow-lg');
+            }
+        })
+
+        //应用语言函数
+        function applyLang(lang){
+            currentLang = lang;
+            langText.innerText = lang === "zh" ? "中文":"EN";
+            //普通dom i18n
+            document.querySelectorAll("[data-i18n]").forEach(el=>{
+                const k = el.getAttribute("data-i18n");
+                if(!i18n[lang][k]) return;
+                if (el.tagName === "OPTGROUP") el.label = i18n[lang][k];
+                else if (el.tagName === "OPTION") el.textContent = i18n[lang][k];
+                else el.innerText = i18n[lang][k];
+            })
+            document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+                const k = el.getAttribute("data-i18n-placeholder");
+                if(i18n[lang][k]) el.setAttribute("placeholder", i18n[lang][k]);
+            })
+            //tab按钮文字
+            document.querySelectorAll("[data-i18n-key]").forEach(el=>{
+                const k = el.getAttribute("data-i18n-key");
+                el.innerText = i18n[lang][k];
+            })
+        }
+
+        langBtn.addEventListener('click', ()=>{
+            const next = currentLang === "zh" ? "en":"zh";
+            applyLang(next);
+        })
+
+        //乐器卡片点击
+        instrumentCards.forEach(card=>{
+            card.addEventListener('click',()=>{
+                const type = card.dataset.type;
+                const data = instrumentData[currentLang][type];
+                modalTitle.innerText = data.title;
+                document.getElementById('tab-intro').innerHTML = data.intro;
+                document.getElementById('tab-history').innerHTML = data.history;
+                document.getElementById('tab-structure').innerHTML = data.structure;
+                document.getElementById('tab-kind').innerHTML = data.kind;
+                document.getElementById('tab-timbre').innerHTML = data.timbre;
+                document.getElementById('tab-master').innerHTML = data.master;
+
+                tabItems.forEach(t=>t.classList.remove('active'));
+                tabPanels.forEach(p=>p.classList.remove('show'));
+                tabItems[0].classList.add('active');
+                document.getElementById('tab-intro').classList.add('show');
+
+                modal.style.display = "block";
+                document.body.style.overflow = "hidden";
+            })
+        })
+        modalClose.addEventListener('click',()=>{
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        })
+        modal.addEventListener('click',(e)=>{
+            if(e.target === modal){
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        })
+        tabItems.forEach(tab=>{
+            tab.addEventListener('click',()=>{
+                const targetTab = tab.dataset.tab;
+                tabItems.forEach(t=>t.classList.remove('active'));
+                tabPanels.forEach(p=>p.classList.remove('show'));
+                tab.classList.add('active');
+                document.getElementById('tab-'+targetTab).classList.add('show');
+            })
+        })
+
+        //曲目卡片点击
+        musicCards.forEach(card=>{
+            card.addEventListener('click',()=>{
+                const mid = card.dataset.music;
+                const m = musicData[currentLang][mid];
+                musicModalTitle.innerText = m.title;
+                audioSource.src = m.src;
+                audioPlayer.load();
+                musicDescWrap.innerHTML = m.desc;
+                musicModal.style.display = "block";
+                document.body.style.overflow = "hidden";
+            })
+        })
+        function closeMusicModal(){
+            musicModal.style.display = "none";
+            audioPlayer.pause();
+            audioSource.src = "";
+            document.body.style.overflow = "auto";
+        }
+        musicModalClose.addEventListener('click',closeMusicModal);
+        musicModal.addEventListener('click',(e)=>{
+            if(e.target === musicModal) closeMusicModal();
+        })
+
+        //初始化中文
+        applyLang("zh");
+    </script>
+
+    <!-- 互动答题弹窗（iframe 嵌入 quiz/index.html） -->
+    <div id="quizModal" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,0.78)">
+        <span id="quizModalClose" title="关闭" style="position:absolute;top:14px;right:18px;z-index:20001;font-size:30px;cursor:pointer;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,0.6);line-height:1;padding:6px 10px;border-radius:6px;background:rgba(0,0,0,0.25);transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,0.55)'" onmouseout="this.style.background='rgba(0,0,0,0.25)'">×</span>
+        <iframe id="quizFrame" src="about:blank" style="position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent"></iframe>
+        <div id="quizLoading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:20000;color:#fff;font-size:18px;letter-spacing:2px;background:rgba(20,24,24,0.78);transition:opacity .4s"><span id="quizLoadingText" style="padding:14px 26px;border:2px solid rgba(255,255,255,0.5);border-radius:8px;background:rgba(0,0,0,0.4);text-align:center">正在加载互动答题…</span><a id="quizLoadingExt" href="quiz/index.html?autostart=1" target="_blank" style="display:none;color:#fff;text-decoration:none;padding:10px 22px;border:1px solid rgba(255,255,255,0.6);border-radius:8px;font-size:14px;background:rgba(255,255,255,0.12)">在新窗口中打开 →</a></div>
+    </div>
+    <script>
+    (function(){
+        var quizModal = document.getElementById('quizModal');
+        var quizFrame = document.getElementById('quizFrame');
+        var quizSrc = 'quiz/index.html?autostart=1';
+        function tryOpenQuiz(){
+            try {
+                var w = quizFrame.contentWindow;
+                if (w && typeof w.__openQuiz === 'function') {
+                    w.__openQuiz();
+                    return true;
+                }
+            } catch(e) { console.warn('[quizFrame onload try]', e); }
+            return false;
+        }
+        // iframe onload 时主动调用（不依赖 iframe 内脚本时机）
+        quizFrame.addEventListener('load', function(){
+            var attempts = 0;
+            (function retry(){
+                attempts++;
+                if (tryOpenQuiz()) {
+                    // iframe 内 quiz 弹窗已显示 → 给 800ms 让 Tailwind/图片/音频渲染，隐藏 loading
+                    setTimeout(function(){
+                        var ld = document.getElementById('quizLoading');
+                        if (ld) ld.style.opacity = '0';
+                        setTimeout(function(){ if (ld) ld.style.display = 'none'; }, 420);
+                    }, 800);
+                    return;
+                }
+                if (attempts < 20) setTimeout(retry, 150);
+                else {
+                    // 超时兜底：tryOpenQuiz 一直失败（iframe 内 quiz 没显示）
+                    // 不再喊用户点按钮 → 直接自动 window.open 新窗口
+                    try {
+                        var opened = window.open(quizSrc, '_blank');
+                        if (opened) {
+                            console.log('[quizFrame] 自动打开新窗口（iframe 嵌入超时）');
+                            // 关掉当前弹窗，让用户在新窗口答题
+                            closeQuizModal();
+                            return;
+                        }
+                    } catch(e) { console.warn('[quizFrame] window.open failed', e); }
+                    // 浏览器拦截了弹窗 → 才提示用户手动点
+                    var ldText = document.getElementById('quizLoadingText');
+                    if (ldText) ldText.textContent = '请允许弹窗后在新窗口中打开';
+                    var ldExt = document.getElementById('quizLoadingExt');
+                    if (ldExt) ldExt.style.display = 'inline-block';
+                    console.warn('[quizFrame] __openQuiz not ready after retries, popup blocked');
+                }
+            })();
+        });
+        function openQuizModal(){
+            // 直接打开新窗口 → 绕开所有 iframe 加载慢 / 时序问题
+            try {
+                var w = window.open(quizSrc, '_blank');
+                if (w) { console.log('[quizNav] 已自动打开新窗口'); return; }
+            } catch(e) { console.warn('[quizNav] window.open failed', e); }
+            // 浏览器拦截弹窗 → 退回 iframe 弹窗方案（兼容老逻辑）
+            var ld = document.getElementById('quizLoading');
+            if (ld) { ld.style.display = 'flex'; ld.style.opacity = '1'; }
+            if (!quizFrame.src || quizFrame.src === 'about:blank' || quizFrame.src.indexOf('about:blank') >= 0) {
+                quizFrame.src = quizSrc;
+            } else {
+                tryOpenQuiz();
+                setTimeout(function(){
+                    if (ld) { ld.style.opacity = '0'; setTimeout(function(){ ld.style.display = 'none'; }, 420); }
+                }, 200);
+            }
+            quizModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeQuizModal(){
+            quizModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        var btn = document.getElementById('quizNavBtn');
+        if (btn) btn.addEventListener('click', openQuizModal);
+        var cls = document.getElementById('quizModalClose');
+        if (cls) cls.addEventListener('click', closeQuizModal);
+        quizModal.addEventListener('click', function(e){ if (e.target === quizModal) closeQuizModal(); });
+        document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && quizModal.style.display === 'flex') closeQuizModal(); });
+        // iframe 内答题结束/返回时通知父页面关闭弹窗
+        window.addEventListener('message', function(e){
+            try {
+                var d = e.data;
+                if (d && d.type === 'quizClosed') closeQuizModal();
+            } catch(err) {}
+        });
+    })();
+    </script>
+</body>
+</html>

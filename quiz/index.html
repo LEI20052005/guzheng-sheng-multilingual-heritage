@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互动答题 | 声生不息</title>
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 思源宋体 国风字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2F4F4F',
+                        secondary: '#6B8E8E',
+                        rice: '#F5F2EB',
+                        ink: '#1A1D1D',
+                        accent: '#A67C52'
+                    },
+                    fontFamily: {
+                        song: ['"Noto Serif SC"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(160deg, #F5F2EB 0%, #EAE3D6 60%, #E2D9C8 100%);
+        }
+        .quiz-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+        .quiz-wrap {
+            width: 100%;
+            max-width: 780px;
+            background: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(47, 79, 79, 0.18);
+        }
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #2F4F4F, #1d3a3a);
+            color: #fff;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .quiz-lang-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: #fff;
+            border-radius: 99px;
+            padding: 5px 16px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .quiz-lang-btn:hover {
+            background: rgba(255,255,255,0.28);
+        }
+        .quiz-body {
+            padding: 28px 30px;
+        }
+        .quiz-screen {
+            display: none;
+        }
+        .quiz-screen.show {
+            display: block;
+        }
+        .quiz-start-hero {
+            text-align: center;
+            padding: 6px 0;
+        }
+        .quiz-start-hero .hero-icon {
+            font-size: 46px;
+            color: #A67C52;
+            margin-bottom: 10px;
+        }
+        .quiz-rules {
+            background: #F5F2EB;
+            border: 1px dashed #A67C52;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .quiz-rules li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin: 9px 0;
+            font-size: 15px;
+            color: #444;
+            line-height: 1.6;
+        }
+        .quiz-rules li i {
+            color: #A67C52;
+            margin-top: 4px;
+        }
+        .quiz-begin-btn {
+            background: linear-gradient(135deg, #A67C52, #8c6742);
+            color: #fff;
+            padding: 14px 38px;
+            border-radius: 99px;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 20px rgba(166,124,82,0.35);
+            transition: all 0.3s ease;
+        }
+        .quiz-begin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(166,124,82,0.45);
+        }
+        .quiz-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        .quiz-progress {
+            height: 8px;
+            background: #e5e0d6;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .quiz-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #A67C52, #C99A66);
+            border-radius: 99px;
+            transition: width 0.5s ease;
+        }
+        .quiz-qcard {
+            background: #F5F2EB;
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 18px;
+            border-left: 4px solid #A67C52;
+        }
+        .quiz-qtext {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A1D1D;
+            line-height: 1.7;
+        }
+        .quiz-opt {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            text-align: left;
+            background: #fff;
+            border: 2px solid #e2dccf;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+        .quiz-opt:hover:not(:disabled) {
+            border-color: #A67C52;
+            transform: translateX(4px);
+        }
+        .quiz-opt-key {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: #2F4F4F;
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .quiz-opt-correct {
+            border-color: #2e8b57;
+            background: #e9f7ef;
+        }
+        .quiz-opt-correct .quiz-opt-key {
+            background: #2e8b57;
+        }
+        .quiz-opt-wrong {
+            border-color: #c0392b;
+            background: #fdf0ee;
+            animation: quizShake 0.4s ease;
+        }
+        .quiz-opt-wrong .quiz-opt-key {
+            background: #c0392b;
+        }
+        .quiz-opt-dim {
+            opacity: 0.5;
+        }
+        .quiz-opt:disabled {
+            cursor: default;
+        }
+        @keyframes quizShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .quiz-fb {
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-top: 8px;
+        }
+        .quiz-fb-correct {
+            background: #e9f7ef;
+            border: 1px solid #2e8b57;
+        }
+        .quiz-fb-wrong {
+            background: #fdf0ee;
+            border: 1px solid #c0392b;
+        }
+        .quiz-fb-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1d6b42;
+        }
+        .quiz-fb-head.err {
+            color: #b03a2e;
+        }
+        .quiz-fb-body {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #555;
+            background: rgba(255,255,255,0.75);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        .quiz-stamp {
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #2e8b57;
+            border: 3px solid #2e8b57;
+            border-radius: 6px;
+            padding: 2px 10px;
+            transform: rotate(6deg);
+            animation: stampPop 0.5s ease;
+            opacity: 0.9;
+        }
+        .quiz-stamp.bad {
+            color: #c0392b;
+            border-color: #c0392b;
+            transform: rotate(-6deg);
+        }
+        @keyframes stampPop {
+            0% { transform: rotate(6deg) scale(2.2); opacity: 0; }
+            60% { transform: rotate(6deg) scale(0.92); opacity: 1; }
+            100% { transform: rotate(6deg) scale(1); }
+        }
+        .quiz-next {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            background: #A67C52;
+            color: #fff;
+            padding: 11px 26px;
+            border-radius: 99px;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+            float: right;
+        }
+        .quiz-next:hover {
+            background: #8c6742;
+            transform: translateX(3px);
+        }
+        .quiz-result-body {
+            text-align: center;
+            padding: 10px 0 6px;
+        }
+        .quiz-score-big {
+            font-size: 52px;
+            font-weight: 900;
+            color: #2F4F4F;
+            line-height: 1.1;
+        }
+        .quiz-stars {
+            font-size: 22px;
+            color: #E6B93C;
+            margin: 12px 0;
+            letter-spacing: 6px;
+        }
+        .quiz-stars .fa-regular {
+            color: #d8d2c4;
+        }
+        .quiz-rank-big {
+            font-size: 30px;
+            font-weight: 900;
+            color: #A67C52;
+            margin: 10px 0 4px;
+            letter-spacing: 4px;
+        }
+        .quiz-result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+        .quiz-btn {
+            border-radius: 99px;
+            padding: 11px 28px;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+        .quiz-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+        }
+        @media (max-width: 768px) {
+            .quiz-body { padding: 20px 16px; }
+            .quiz-qtext { font-size: 16px; }
+        }
+    </style>
+</head>
+<body class="font-song text-ink">
+    <div class="quiz-page">
+        <div class="quiz-wrap">
+            <div class="quiz-header">
+                <span class="flex items-center gap-3">
+                    <i class="fa-solid fa-clapperboard"></i>
+                    <span data-i18n="quiz_title">丝竹寻音 · 互动答题</span>
+                </span>
+                <button id="langBtn" class="quiz-lang-btn">EN</button>
+            </div>
+            <div class="quiz-body">
+                <!-- 开始界面 -->
+                <div class="quiz-screen show" id="quizStart">
+                    <div class="quiz-start-hero">
+                        <div class="hero-icon"><i class="fa-solid fa-music"></i></div>
+                        <h4 class="text-2xl md:text-3xl font-bold text-primary mb-2" data-i18n="quiz_title">丝竹寻音 · 互动答题</h4>
+                        <p class="text-gray-500 text-[15px]" data-i18n="quiz_sub">听古乐、识丝竹，测一测你对古筝与笙的了解</p>
+                    </div>
+                    <div class="quiz-rules">
+                        <h5 class="font-bold text-primary mb-2">
+                            <i class="fa-solid fa-book-open mr-2 text-accent"></i><span data-i18n="quiz_rules_title">玩法说明</span>
+                        </h5>
+                        <ul>
+                            <li><i class="fa-solid fa-circle-question"></i><span data-i18n="quiz_rule1">每轮 8 道题，均为古筝与笙的知识问答</span></li>
+                            <li><i class="fa-solid fa-circle-question"></i><span data-i18n="quiz_rule2">答对 +10 分，答错会亮出正确答案并附知识卡片</span></li>
+                            <li><i class="fa-solid fa-circle-question"></i><span data-i18n="quiz_rule3">根据得分获得不同称号，向“传世乐师”发起挑战</span></li>
+                        </ul>
+                    </div>
+                    <div class="text-center mt-6">
+                        <button onclick="startQuiz()" class="quiz-begin-btn">
+                            <i class="fa-solid fa-play mr-2"></i><span data-i18n="quiz_begin">开始寻音之旅</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- 答题界面 -->
+                <div class="quiz-screen" id="quizPlay">
+                    <div class="quiz-topbar">
+                        <span id="quizQNum" class="font-bold text-primary">第 1 题 / 共 8 题</span>
+                        <span id="quizScore" class="text-accent font-bold"><i class="fa-solid fa-gem mr-1"></i>得分 0</span>
+                    </div>
+                    <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill" style="width:0%"></div></div>
+                    <div class="quiz-qcard">
+                        <div class="quiz-qtext" id="quizQText"></div>
+                    </div>
+                    <div id="quizOptions"></div>
+                    <div class="quiz-fb" id="quizFeedback" style="display:none"></div>
+                    <button class="quiz-next" id="quizNextBtn" onclick="nextQuizStep()">
+                        <span>下一题</span><i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <div style="clear:both"></div>
+                </div>
+                <!-- 结算界面 -->
+                <div class="quiz-screen" id="quizResult">
+                    <div class="quiz-result-body">
+                        <div class="hero-icon"><i class="fa-solid fa-medal"></i></div>
+                        <h4 class="text-2xl font-bold text-primary mb-2" data-i18n="quiz_result_title">寻音之旅圆满结束</h4>
+                        <div class="quiz-score-big" id="quizScoreBig">0</div>
+                        <div class="text-gray-500 text-sm mb-1" data-i18n="quiz_score_label">本局得分</div>
+                        <div class="quiz-stars" id="quizStars"></div>
+                        <div class="text-sm text-gray-500 mt-1" data-i18n="quiz_correct_label">答对题数</div>
+                        <div class="text-lg font-bold text-primary" id="quizCorrectCount">0 / 8</div>
+                        <div class="quiz-rank-big" id="quizRank">初闻丝竹</div>
+                        <div class="text-gray-500 text-sm" data-i18n="quiz_rank_label">获得的称号</div>
+                        <p class="text-gray-400 text-sm mt-3" data-i18n="quiz_share">继续学习资料库中的知识，挑战满分成为“传世乐师”！</p>
+                        <div class="quiz-result-actions">
+                            <button class="quiz-btn" style="background:#2F4F4F;color:#fff" onclick="startQuiz()">
+                                <i class="fa-solid fa-rotate-right mr-2"></i><span data-i18n="quiz_again">再来一局</span>
+                            </button>
+                            <button class="quiz-btn" style="background:#A67C52;color:#fff" onclick="closeQuiz()">
+                                <span data-i18n="quiz_back">返回</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="quiz-data.js"></script>
+    <script>
+        /* ========== 多语言文案（仅答题界面） ========== */
+        const i18n = {
+            zh: {
+                quiz_title: "丝竹寻音 · 互动答题",
+                quiz_sub: "听古乐、识丝竹，测一测你对古筝与笙的了解",
+                quiz_rules_title: "玩法说明",
+                quiz_rule1: "每轮 8 道题，均为古筝与笙的知识问答",
+                quiz_rule2: "答对 +10 分，答错会亮出正确答案并附知识卡片",
+                quiz_rule3: "根据得分获得不同称号，向“传世乐师”发起挑战",
+                quiz_begin: "开始寻音之旅",
+                quiz_result_title: "寻音之旅圆满结束",
+                quiz_score_label: "本局得分",
+                quiz_correct_label: "答对题数",
+                quiz_rank_label: "获得的称号",
+                quiz_share: "继续学习资料库中的知识，挑战满分成为“传世乐师”！",
+                quiz_again: "再来一局",
+                quiz_back: "返回"
+            },
+            en: {
+                quiz_title: "String & Reed Quest",
+                quiz_sub: "Listen, learn and test your knowledge of Guzheng & Sheng",
+                quiz_rules_title: "How to Play",
+                quiz_rule1: "8 questions per round, all about Guzheng and Sheng knowledge",
+                quiz_rule2: "+10 points per correct answer; wrong answers reveal the correct one with a knowledge card",
+                quiz_rule3: "Earn a title based on your score and aim for 'Master Musician'",
+                quiz_begin: "Start the Quest",
+                quiz_result_title: "Journey Complete!",
+                quiz_score_label: "Score",
+                quiz_correct_label: "Correct Answers",
+                quiz_rank_label: "Title Earned",
+                quiz_share: "Keep exploring the library to score full marks and become a Master Musician!",
+                quiz_again: "Play Again",
+                quiz_back: "Back"
+            }
+        };
+
+        let currentLang = "zh";
+        const quizState = { started: false, finished: false, questions: [], idx: 0, score: 0, correct: 0, answered: false, selected: -1 };
+
+        /* ========== 工具函数 ========== */
+        function shuffleArray(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.quiz-screen').forEach(s => s.classList.remove('show'));
+            document.getElementById(id).classList.add('show');
+        }
+
+        /* ========== 答题逻辑 ========== */
+        function startQuiz() {
+            const pool = quizData[currentLang];
+            const texts = shuffleArray(pool.text).slice(0, 8);
+            quizState.questions = shuffleArray(texts);
+            quizState.idx = 0; quizState.score = 0; quizState.correct = 0;
+            quizState.answered = false; quizState.selected = -1;
+            quizState.started = true; quizState.finished = false;
+            showScreen('quizPlay');
+            renderQuiz();
+        }
+
+        function renderQuiz() {
+            const lang = currentLang;
+            const q = quizState.questions[quizState.idx];
+            const total = quizState.questions.length;
+            const num = quizState.idx + 1;
+            document.getElementById('quizQNum').innerText = lang === 'zh' ? `第 ${num} 题 / 共 ${total} 题` : `Question ${num} of ${total}`;
+            document.getElementById('quizScore').innerHTML = `<i class="fa-solid fa-gem mr-1"></i>` + (lang === 'zh' ? `得分 ${quizState.score}` : `Score ${quizState.score}`);
+            document.getElementById('quizProgressFill').style.width = (num / total * 100) + '%';
+            document.getElementById('quizQText').innerText = q.q;
+            // 选项
+            const optWrap = document.getElementById('quizOptions');
+            optWrap.innerHTML = q.options.map((opt, i) => {
+                const key = String.fromCharCode(65 + i);
+                let cls = 'quiz-opt';
+                let inner = `<span class="quiz-opt-key">${key}</span><span>${opt}</span>`;
+                if (quizState.answered) {
+                    if (i === q.answer) {
+                        cls += ' quiz-opt-correct';
+                        inner = `<span class="quiz-opt-key">${key}</span><span>${opt}</span><i class="fa-solid fa-check ml-auto text-green-700"></i>`;
+                    } else if (i === quizState.selected) {
+                        cls += ' quiz-opt-wrong';
+                        inner = `<span class="quiz-opt-key">${key}</span><span>${opt}</span><i class="fa-solid fa-xmark ml-auto text-red-700"></i>`;
+                    } else {
+                        cls += ' quiz-opt-dim';
+                    }
+                }
+                return `<button class="${cls}" onclick="selectQuizOption(${i})" ${quizState.answered ? 'disabled' : ''}>${inner}</button>`;
+            }).join('');
+            // 反馈区
+            const fb = document.getElementById('quizFeedback');
+            const nextBtn = document.getElementById('quizNextBtn');
+            if (quizState.answered) {
+                const correct = quizState.selected === q.answer;
+                const praises = quizData[lang].praise;
+                const praiseTxt = praises[Math.floor(Math.random() * praises.length)];
+                const correctLetter = String.fromCharCode(65 + q.answer);
+                fb.style.display = 'block';
+                fb.className = 'quiz-fb ' + (correct ? 'quiz-fb-correct' : 'quiz-fb-wrong');
+                fb.innerHTML = correct ? `
+                    <div class="quiz-fb-head">
+                        <span><i class="fa-solid fa-circle-check mr-1"></i> ${lang === 'zh' ? '回答正确' : 'Correct'} · ${praiseTxt}</span>
+                        <span class="quiz-stamp">${lang === 'zh' ? '妙' : 'Nice'}</span>
+                    </div>
+                    <div class="quiz-fb-body">${q.explain}</div>` : `
+                    <div class="quiz-fb-head err">
+                        <span><i class="fa-solid fa-circle-xmark mr-1"></i> ${lang === 'zh' ? '回答错误，正确答案是' : 'Wrong — the correct answer is'}: <b>${correctLetter}. ${q.options[q.answer]}</b></span>
+                        <span class="quiz-stamp bad">${lang === 'zh' ? '错' : 'Oops'}</span>
+                    </div>
+                    <div class="quiz-fb-body">${q.explain}</div>`;
+                const isLast = quizState.idx === total - 1;
+                nextBtn.style.display = 'inline-flex';
+                nextBtn.innerHTML = isLast
+                    ? `<span>${lang === 'zh' ? '查看成绩' : 'View Result'}</span><i class="fa-solid fa-flag-checkered"></i>`
+                    : `<span>${lang === 'zh' ? '下一题' : 'Next'}</span><i class="fa-solid fa-arrow-right"></i>`;
+            } else {
+                fb.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+        }
+
+        function selectQuizOption(i) {
+            if (quizState.answered) return;
+            quizState.answered = true;
+            quizState.selected = i;
+            const q = quizState.questions[quizState.idx];
+            if (i === q.answer) {
+                quizState.score += 10;
+                quizState.correct++;
+                playQuizTone(true);
+            } else {
+                playQuizTone(false);
+            }
+            renderQuiz();
+        }
+
+        function nextQuizStep() {
+            if (quizState.idx === quizState.questions.length - 1) {
+                quizState.finished = true;
+                showScreen('quizResult');
+                renderResult();
+            } else {
+                quizState.idx++;
+                quizState.answered = false;
+                quizState.selected = -1;
+                renderQuiz();
+            }
+        }
+
+        function renderResult() {
+            const lang = currentLang;
+            const total = quizState.questions.length;
+            const rank = quizRanks.filter(r => quizState.score / 10 >= r.min).pop();
+            document.getElementById('quizScoreBig').innerText = quizState.score;
+            document.getElementById('quizCorrectCount').innerText = `${quizState.correct} / ${total}`;
+            document.getElementById('quizRank').innerText = rank[lang];
+            let stars = '';
+            for (let i = 0; i < total; i++) {
+                stars += i < quizState.correct ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+            }
+            document.getElementById('quizStars').innerHTML = stars;
+        }
+
+        /* “返回”：新窗口模式关闭窗口回到主站；iframe 模式通知父页面；独立打开回到开始界面 */
+        function closeQuiz() {
+            if (window.opener && window.opener !== window) {
+                try { window.opener.focus(); } catch (e) {}
+                try { window.close(); } catch (e) {}
+                setTimeout(function () { showScreen('quizStart'); }, 200);
+                return;
+            }
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'quizClosed' }, '*');
+                    return;
+                }
+            } catch (e) {}
+            showScreen('quizStart');
+        }
+
+        /* 答题音效：答对奏五声音阶上行，答错奏下行低音（Web Audio 合成，无音频文件） */
+        let quizAudioCtx = null;
+        function playQuizTone(correct) {
+            try {
+                if (!quizAudioCtx) quizAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = correct ? [523.25, 587.33, 659.25, 783.99, 880] : [392, 329.63, 261.63];
+                const t0 = quizAudioCtx.currentTime;
+                notes.forEach((f, i) => {
+                    const osc = quizAudioCtx.createOscillator();
+                    const gain = quizAudioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = f;
+                    gain.gain.setValueAtTime(0.0001, t0 + i * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.25, t0 + i * 0.12 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.12 + 0.11);
+                    osc.connect(gain); gain.connect(quizAudioCtx.destination);
+                    osc.start(t0 + i * 0.12); osc.stop(t0 + i * 0.12 + 0.12);
+                });
+            } catch (e) {}
+        }
+
+        /* ========== 多语言切换 ========== */
+        function applyLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key] != null) el.textContent = i18n[lang][key];
+            });
+            const btn = document.getElementById('langBtn');
+            if (btn) btn.textContent = lang === 'zh' ? 'EN' : '中文';
+            // 答题/结算进行中时同步当前界面
+            if (quizState.started && !quizState.finished && document.getElementById('quizPlay').classList.contains('show')) {
+                syncQuizQuestions();
+                renderQuiz();
+            } else if (quizState.finished && document.getElementById('quizResult').classList.contains('show')) {
+                renderResult();
+            }
+        }
+
+        /* 语言切换时按题目 id 重建当前题目，保持进度不变 */
+        function syncQuizQuestions() {
+            if (!quizState.started || quizState.finished) return;
+            const pool = quizData[currentLang];
+            const map = {};
+            pool.text.forEach(q => map[q.id] = q);
+            const mapped = quizState.questions.map(q => map[q.id]).filter(Boolean);
+            if (mapped.length > 0) quizState.questions = mapped;
+        }
+
+        document.getElementById('langBtn').addEventListener('click', () => {
+            applyLang(currentLang === 'zh' ? 'en' : 'zh');
+        });
+
+        /* 主站通过 iframe / window.open 嵌入时的兼容接口 */
+        window.__openQuiz = function () {
+            if (quizState.started && !quizState.finished) showScreen('quizPlay');
+            else if (quizState.finished) showScreen('quizResult');
+            else showScreen('quizStart');
+            return true;
+        };
+
+        /* 初始化 */
+        applyLang('zh');
+    </script>
+</body>
+</html>
