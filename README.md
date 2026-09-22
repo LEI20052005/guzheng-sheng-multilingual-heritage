@@ -30,14 +30,14 @@
 │   ├── videos/             # 演示视频
 │   └── audio/              # 经典曲目音频
 ├── js/                     # 3D 查看器脚本
-│   ├── model-viewer.js     #    模型渲染主逻辑
-│   ├── plugin-check.js     #    WebGL / Three.js 环境检测
-│   └── file-pick-viewer.js #    本地文件模式查看器
+│   ├── model-viewer.js     # 模型渲染主逻辑
+│   ├── plugin-check.js     # WebGL / Three.js 环境检测
+│   └── file-pick-viewer.js # 本地文件模式查看器
 ├── libs/                   # Three.js 及加载器等本地依赖
 ├── models/                 # 3D 模型文件（.glb / .fbx）
 └── quiz/                   # 互动答题
-    ├── index.html          #    答题页面
-    └── quiz-data.js        #    中英双语题库
+    ├── index.html          # 答题页面
+    └── quiz-data.js        # 中英双语题库
 ```
 
 ##⚠️ 项目资源取舍说明
