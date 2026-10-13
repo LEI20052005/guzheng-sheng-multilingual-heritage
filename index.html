@@ -203,6 +203,7 @@
                     <a href="#video" class="hover:text-accent transition-colors" data-i18n="nav_video">视频展厅</a>
                     <a href="model-show.html" target="_blank" class="hover:text-accent transition-colors" data-i18n="nav_model">建模展示</a>
                     <button id="quizNavBtn" class="hover:text-accent transition-colors flex items-center gap-1"><i class="fa-solid fa-clapperboard"></i><span data-i18n="nav_quiz">互动答题</span></button>
+                    <a href="#message" class="hover:text-accent transition-colors" data-i18n="nav_message">留言墙</a>
                     <a href="#about" class="hover:text-accent transition-colors" data-i18n="nav_about">项目介绍</a>
                     <!-- 多语言切换按钮 -->
                     <button id="langBtn" class="border border-white/60 px-3 py-1 rounded hover:bg-white/20">
@@ -396,6 +397,68 @@
         </div>
     </section>
 
+    <!-- 留言墙 / Guestbook -->
+    <section id="message" class="py-20 px-6 md:px-12 bg-primary/5">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-14">
+                <h3 class="text-[32px] text-primary font-bold mb-3" data-i18n="msg_title">观展留言墙</h3>
+                <p class="text-gray-600 mb-4" data-i18n="msg_subtitle">留下您对传统民乐的感受与祝福</p>
+                <div class="w-24 h-1 bg-secondary mx-auto"></div>
+            </div>
+
+            <!-- 留言规则 -->
+            <div class="bg-secondary/5 border border-secondary/20 rounded-xl p-5 md:p-6 mb-6">
+                <h5 class="font-bold text-primary mb-3 flex items-center gap-2" data-i18n="rules_title">
+                    <i class="fa-solid fa-circle-info text-accent"></i> 留言须知
+                </h5>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i><span data-i18n="rules_1">文明发言，尊重每一位访客</span></li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i><span data-i18n="rules_2">中文内容必填，英文内容选填</span></li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i><span data-i18n="rules_3">每条留言不超过 300 字，昵称不超过 20 字</span></li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i><span data-i18n="rules_4">点击爱心表示认同，再次点击取消点赞</span></li>
+                    <li class="flex gap-2"><i class="fa-solid fa-check text-accent mt-0.5"></i><span data-i18n="rules_5">留言仅代表个人观点，与本站立场无关</span></li>
+                </ul>
+            </div>
+
+            <!-- 留言表单 -->
+            <div class="bg-white rounded-xl shadow-md p-6 md:p-8 mb-10 border border-secondary/10">
+                <div class="mb-4">
+                    <input id="msgName" type="text" maxlength="20" data-i18n-placeholder="msg_name_ph" placeholder="您的昵称"
+                        class="w-full px-4 py-3 border border-secondary/30 rounded-lg focus:outline-none focus:border-primary bg-rice/50">
+                </div>
+                <!-- 语言选择 -->
+                <div class="mb-4 flex items-center gap-3">
+                    <span class="text-sm text-gray-500" data-i18n="form_lang_label">留言语言：</span>
+                    <div class="flex gap-2">
+                        <button type="button" id="langOptZh" class="lang-opt px-4 py-1.5 rounded-full text-sm border transition-colors bg-primary text-white border-primary">中文</button>
+                        <button type="button" id="langOptEn" class="lang-opt px-4 py-1.5 rounded-full text-sm border transition-colors border-secondary/30 text-gray-500 hover:border-primary">English</button>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <textarea id="msgContent" rows="3" maxlength="300" data-i18n-placeholder="msg_content_ph" placeholder="写下您的观展感受…"
+                        class="w-full px-4 py-3 border border-secondary/30 rounded-lg focus:outline-none focus:border-primary bg-rice/50 resize-y"></textarea>
+                </div>
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <span id="msgFormTip" class="text-sm"></span>
+                    <button id="msgSubmit" data-i18n="msg_submit"
+                        class="bg-primary hover:bg-secondary text-white px-6 py-2.5 rounded-lg transition-colors">发表留言</button>
+                </div>
+            </div>
+
+            <!-- 留言计数 -->
+            <div class="flex items-center gap-2 mb-5 text-gray-600 text-sm">
+                <i class="fa-solid fa-comments text-accent"></i>
+                <span id="msgCount"></span>
+            </div>
+
+            <!-- 留言列表 -->
+            <div id="msgList" class="grid md:grid-cols-2 gap-5"></div>
+
+            <!-- 分页控件 -->
+            <div id="msgPagination" class="flex items-center justify-center gap-2 mt-10 flex-wrap"></div>
+        </div>
+    </section>
+
     <!-- 乐器详情弹窗 -->
     <div class="instrument-modal" id="instrumentModal">
         <div class="modal-container">
@@ -498,7 +561,31 @@
                 tab_structure:"乐器结构",
                 tab_kind:"乐器种类",
                 tab_timbre:"音色特点",
-                tab_master:"名家与经典曲目"
+                tab_master:"名家与经典曲目",
+                nav_message:"留言墙",
+                msg_title:"观展留言墙",
+                msg_subtitle:"留下您对传统民乐的感受与祝福",
+                msg_name_ph:"您的昵称",
+                msg_content_ph:"写下您的观展感受（中文或英文均可）…",
+                form_lang_label:"留言语言：",
+                form_zh_label:"中文内容",
+                form_en_label:"English content（选填）",
+                form_en_ph:"Write your feedback in English…",
+                msg_submit:"发表留言",
+                msg_empty:"请填写昵称和留言内容",
+                msg_empty_both:"请至少填写中文或英文留言内容",
+                msg_success:"留言发表成功！",
+                msg_count_label:"条留言",
+                page_prev:"上一页",
+                page_next:"下一页",
+                page_of:"第 {cur} / {total} 页",
+                sort_likes:"按赞数排序",
+                rules_title:"留言须知",
+                rules_1:"文明发言，尊重每一位访客",
+                rules_2:"自由书写中文或英文，写哪种语言就归入哪个语言界面",
+                rules_3:"每条留言不超过 300 字，昵称不超过 20 字",
+                rules_4:"点击爱心表示认同，再次点击取消点赞",
+                rules_5:"留言仅代表个人观点，与本站立场无关"
             },
             en:{
                 logo:"Enduring Melodies",
@@ -548,7 +635,31 @@
                 tab_structure:"Structure",
                 tab_kind:"Types",
                 tab_timbre:"Timbre",
-                tab_master:"Masters & Repertoire"
+                tab_master:"Masters & Repertoire",
+                nav_message:"Guestbook",
+                msg_title:"Visitor Guestbook",
+                msg_subtitle:"Share your thoughts on traditional Chinese music",
+                msg_name_ph:"Your name",
+                msg_content_ph:"Write your feedback in Chinese or English…",
+                form_lang_label:"Message language:",
+                form_zh_label:"Chinese content",
+                form_en_label:"English content (optional)",
+                form_en_ph:"Write your feedback in English…",
+                msg_submit:"Post Message",
+                msg_empty:"Please fill in both name and message",
+                msg_empty_both:"Please write at least Chinese or English content",
+                msg_success:"Message posted!",
+                msg_count_label:"messages",
+                page_prev:"Prev",
+                page_next:"Next",
+                page_of:"Page {cur} of {total}",
+                sort_likes:"Sorted by likes",
+                rules_title:"House Rules",
+                rules_1:"Be respectful to all visitors",
+                rules_2:"Write in Chinese or English — it will appear in the matching language view",
+                rules_3:"Max 300 characters per message, 20 for nickname",
+                rules_4:"Click the heart to like; click again to unlike",
+                rules_5:"Comments represent personal views only"
             }
         };
 
@@ -835,6 +946,8 @@
                 const k = el.getAttribute("data-i18n-key");
                 el.innerText = i18n[lang][k];
             })
+            // 留言墙内容随语言刷新
+            if (typeof renderMessages === 'function') renderMessages();
         }
 
         langBtn.addEventListener('click', ()=>{
@@ -907,6 +1020,249 @@
         musicModal.addEventListener('click',(e)=>{
             if(e.target === musicModal) closeMusicModal();
         })
+
+        // ========== 留言墙数据层（localStorage 客户端数据库） ==========
+        // 种子留言：初始数据，中英双语都填好，likes 是初始赞数
+        const seedMessages = [
+            {id:1, name:"林同学", color:"#A67C52", created_at:"2026-07-15", likes:5,
+             zh:"第一次通过3D模型看清了笙的内部结构，原来自由簧长这样！音乐课上老师讲过但从没见过实物。",
+             en:"First time seeing the internal structure of Sheng through a 3D model! Our music teacher mentioned free reeds in class but I've never seen one."},
+            {id:2, name:"Sophia Chen", color:"#6B8E8E", created_at:"2026-07-22", likes:15,
+             zh:"听到《高山流水》的瞬间眼眶就湿了，在海外五年，这是最想家的一刻。感谢团队做这个网站。",
+             en:"Tears welled up the moment High Mountain Running Water started playing. Five years overseas, this is when I missed home the most. Thank you for building this."},
+            {id:3, name:"王老师", color:"#2F4F4F", created_at:"2026-08-03", likes:12,
+             zh:"中学音乐教研组，已把这个资源链接分享给组里，下学期民乐欣赏课就用你们的资料做课件。",
+             en:"Middle school music teaching group — shared this resource with my colleagues. We'll use it for next semester's folk music appreciation class."},
+            {id:4, name:"Sheng_player", color:"#8B6914", created_at:"2026-08-10", likes:4,
+             zh:"学笙三年，第一次在网页上看到笙的完整结构拆解，加键笙的按键传动系统解释得特别清楚。",
+             en:"Studied Sheng for three years, first time seeing a full structural breakdown online. The key-transmission system explanation is spot on."},
+            {id:5, name:"小筝", color:"#A67C52", created_at:"2026-08-18", likes:3,
+             zh:"答题挑战拿了80分！原来古筝有五大流派，之前只知道浙江筝。宝藏网站，会推荐给琴友群。",
+             en:"Scored 80 on the quiz! Didn't know Guzheng has five major regional schools before. Sharing this with my Guzheng study group."},
+            {id:6, name:"James Morrison", color:"#6B8E8E", created_at:"2026-08-25", likes:10,
+             zh:"通过一部音乐纪录片了解到中国传统乐器。3D古筝模型太迷人了，转着看就像真的捧着一件乐器，现在想深入了解！",
+             en:"Discovered Chinese traditional instruments through a music documentary. The 3D Guzheng model is mesmerizing — rotating it around feels like holding a real instrument. Now I want to learn more!"},
+            {id:7, name:"陈阿姨", color:"#8B6914", created_at:"2026-09-02", likes:7,
+             zh:"带九岁女儿看完《渔舟唱晚》视频，她主动说想学古筝。这个网站最棒的地方是让孩子愿意去了解。",
+             en:"Brought my 9-year-old daughter to watch Fisherman's Song at Dusk — she asked to learn Guzheng afterward. Best part of this site is inspiring kids."},
+            {id:8, name:"民乐研究者", color:"#2F4F4F", created_at:"2026-09-10", likes:8,
+             zh:"曾侯乙墓出土笙那段历史整理得很准确，引用了甲骨文中'和'的记载，比很多教材都详细。",
+             en:"The Zeng-Hou-Yi tomb sheng section is well-researched. The oracle-bone inscription reference to 'He' is more detailed than many textbooks."},
+            {id:9, name:"路人甲", color:"#A67C52", created_at:"2026-09-20", likes:2,
+             zh:"从GitHub Pages误打误撞进来的，本来以为是技术Demo，结果听完《冬猎》循环了一下午。",
+             en:"Stumbled in via GitHub Pages expecting a tech demo, ended up looping Winter Hunt all afternoon."},
+            {id:10, name:"风", color:"#6B8E8E", created_at:"2026-10-05", likes:6,
+             zh:"笙的音色太温柔了，像冬天手捧着一杯热茶。希望以后能加入更多古曲音频。",
+             en:"The Sheng timbre is so gentle, like holding a warm cup of tea in winter. Hope more ancient repertoire audio gets added."}
+        ];
+
+        const MSG_PAGE_SIZE = 6;  // 每页显示条数
+        let msgCurrentPage = 1;    // 当前页码
+
+        const MessageDB = {
+            KEY: 'guzheng_sheng_messages_v1',
+            LIKED_KEY: 'guzheng_sheng_liked_ids_v1',
+            getUserMessages() {
+                try {
+                    const raw = localStorage.getItem(this.KEY);
+                    return raw ? JSON.parse(raw) : [];
+                } catch(e) { return []; }
+            },
+            getLikedIds() {
+                try {
+                    const raw = localStorage.getItem(this.LIKED_KEY);
+                    return raw ? JSON.parse(raw) : [];
+                } catch(e) { return []; }
+            },
+            toggleLike(id) {
+                const liked = this.getLikedIds();
+                const idx = liked.indexOf(id);
+                if (idx >= 0) liked.splice(idx, 1);
+                else liked.push(id);
+                try { localStorage.setItem(this.LIKED_KEY, JSON.stringify(liked)); } catch(e){}
+                return idx < 0;  // true = 刚点了赞, false = 刚取消
+            },
+            getAll() {
+                // 合并种子+用户数据，带上当前用户的点赞标记
+                const liked = this.getLikedIds();
+                return [...seedMessages, ...this.getUserMessages()].map(m => ({
+                    ...m,
+                    likes: (m.likes || 0) + (liked.includes(m.id) ? 1 : 0),
+                    liked: liked.includes(m.id)
+                }));
+            },
+            getSortedByLikes() {
+                const liked = this.getLikedIds();
+                // 种子消息：双语，两个语言界面都显示，选当前语言版本
+                const seeds = seedMessages.map(m => ({
+                    ...m,
+                    likes: (m.likes || 0) + (liked.includes(m.id) ? 1 : 0),
+                    liked: liked.includes(m.id),
+                    content: currentLang === 'zh' ? m.zh : m.en
+                }));
+                // 用户消息：单语言，只在对应语言界面显示
+                const users = this.getUserMessages()
+                    .filter(m => m.lang === currentLang)
+                    .map(m => ({
+                        ...m,
+                        likes: (m.likes || 0) + (liked.includes(m.id) ? 1 : 0),
+                        liked: liked.includes(m.id)
+                    }));
+                return [...seeds, ...users].sort((a,b) => {
+                    if (b.likes !== a.likes) return b.likes - a.likes;
+                    return new Date(b.created_at) - new Date(a.created_at);
+                });
+            },
+            add(msg) {
+                const list = this.getUserMessages();
+                list.unshift(msg);
+                try { localStorage.setItem(this.KEY, JSON.stringify(list)); } catch(e){}
+            },
+            remove(id) {
+                const list = this.getUserMessages().filter(m => m.id !== id);
+                try { localStorage.setItem(this.KEY, JSON.stringify(list)); } catch(e){}
+            }
+        };
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        function renderMessages() {
+            const listEl = document.getElementById('msgList');
+            if (!listEl) return;
+            const all = MessageDB.getSortedByLikes();
+            const countEl = document.getElementById('msgCount');
+            if (countEl) countEl.textContent = all.length + ' ' + i18n[currentLang].msg_count_label;
+
+            // 分页
+            const totalPages = Math.max(1, Math.ceil(all.length / MSG_PAGE_SIZE));
+            if (msgCurrentPage > totalPages) msgCurrentPage = totalPages;
+            const start = (msgCurrentPage - 1) * MSG_PAGE_SIZE;
+            const pageItems = all.slice(start, start + MSG_PAGE_SIZE);
+
+            // 渲染当前页卡片
+            listEl.innerHTML = pageItems.map(m => {
+                const initial = escapeHtml((m.name || '?').charAt(0).toUpperCase());
+                const heartClass = m.liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400 group-hover:text-red-400';
+                const isUserMsg = m.id > 1000;  // 种子数据 id 1-10，用户消息是时间戳
+                const delBtn = isUserMsg ? `<button class="del-btn text-gray-300 hover:text-red-500 transition-colors text-sm" data-id="${m.id}" title="删除"><i class="fa-solid fa-trash-can"></i></button>` : '';
+                return `
+                <div class="bg-white rounded-xl shadow p-5 card-hover border border-secondary/10 relative">
+                    <div class="absolute top-3 right-3">${delBtn}</div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0" style="background:${m.color}">${initial}</div>
+                        <div>
+                            <div class="font-bold text-primary">${escapeHtml(m.name)}</div>
+                            <div class="text-xs text-gray-500">${m.created_at}</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 leading-relaxed text-[15px] mb-4">${escapeHtml(m.content)}</p>
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <button class="like-btn flex items-center gap-2 group" data-id="${m.id}">
+                            <span class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${m.liked ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-400 group-hover:bg-red-50 group-hover:text-red-400'}">
+                                <i class="${heartClass} text-base"></i>
+                            </span>
+                            <span class="text-sm font-medium ${m.liked ? 'text-red-500' : 'text-gray-500'}">${m.likes}</span>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // 绑定点赞按钮事件
+            listEl.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = Number(btn.dataset.id);
+                    MessageDB.toggleLike(id);
+                    renderMessages();
+                });
+            });
+
+            // 绑定删除按钮事件
+            listEl.querySelectorAll('.del-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = Number(btn.dataset.id);
+                    if (confirm('确定删除这条留言？')) {
+                        MessageDB.remove(id);
+                        renderMessages();
+                    }
+                });
+            });
+
+            // 渲染分页控件
+            const pageEl = document.getElementById('msgPagination');
+            if (!pageEl) return;
+            if (totalPages <= 1) { pageEl.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn px-4 py-2 rounded-lg border border-secondary/30 text-sm transition-colors ${msgCurrentPage===1?'opacity-40 cursor-not-allowed':'hover:bg-primary hover:text-white hover:border-primary'}" data-page="${msgCurrentPage-1}" ${msgCurrentPage===1?'disabled':''}>‹ ${i18n[currentLang].page_prev}</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                const active = i === msgCurrentPage;
+                html += `<button class="page-btn w-10 h-10 rounded-lg text-sm transition-colors ${active?'bg-primary text-white':'border border-secondary/30 hover:bg-primary hover:text-white hover:border-primary'}" data-page="${i}">${i}</button>`;
+            }
+            html += `<button class="page-btn px-4 py-2 rounded-lg border border-secondary/30 text-sm transition-colors ${msgCurrentPage===totalPages?'opacity-40 cursor-not-allowed':'hover:bg-primary hover:text-white hover:border-primary'}" data-page="${msgCurrentPage+1}" ${msgCurrentPage===totalPages?'disabled':''}>${i18n[currentLang].page_next} ›</button>`;
+            pageEl.innerHTML = html;
+
+            pageEl.querySelectorAll('.page-btn[data-page]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const p = Number(btn.dataset.page);
+                    if (p >= 1 && p <= totalPages) {
+                        msgCurrentPage = p;
+                        renderMessages();
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderMessages);
+
+        // 语言选择按钮
+        let msgLang = currentLang;  // 默认跟随当前界面语言
+        const langOptZh = document.getElementById('langOptZh');
+        const langOptEn = document.getElementById('langOptEn');
+        function setMsgLang(lang) {
+            msgLang = lang;
+            const activeCls = 'bg-primary text-white border-primary';
+            const idleCls = 'border-secondary/30 text-gray-500 hover:border-primary';
+            langOptZh.className = 'lang-opt px-4 py-1.5 rounded-full text-sm border transition-colors ' + (lang === 'zh' ? activeCls : idleCls);
+            langOptEn.className = 'lang-opt px-4 py-1.5 rounded-full text-sm border transition-colors ' + (lang === 'en' ? activeCls : idleCls);
+        }
+        langOptZh.addEventListener('click', () => setMsgLang('zh'));
+        langOptEn.addEventListener('click', () => setMsgLang('en'));
+
+        document.getElementById('msgSubmit').addEventListener('click', () => {
+            const nameEl = document.getElementById('msgName');
+            const contentEl = document.getElementById('msgContent');
+            const tip = document.getElementById('msgFormTip');
+            const name = nameEl.value.trim();
+            const content = contentEl.value.trim();
+
+            if (!name || !content) {
+                tip.textContent = i18n[currentLang].msg_empty;
+                tip.className = 'text-sm text-red-500';
+                return;
+            }
+
+            const today = new Date().toISOString().slice(0,10);
+            const colors = ['#A67C52','#6B8E8E','#2F4F4F','#8B6914'];
+            const newMsg = {
+                id: Date.now(),
+                name: name,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                created_at: today,
+                likes: 0,
+                content: content,
+                lang: msgLang  // 用用户选的语言，不是当前界面语言
+            };
+            MessageDB.add(newMsg);
+            nameEl.value = '';
+            contentEl.value = '';
+            tip.textContent = i18n[currentLang].msg_success;
+            tip.className = 'text-sm text-green-600';
+            msgCurrentPage = 1;
+            renderMessages();
+        });
 
         //初始化中文
         applyLang("zh");
