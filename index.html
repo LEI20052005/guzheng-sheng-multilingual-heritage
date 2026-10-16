@@ -422,9 +422,9 @@
 
             <!-- 留言表单 -->
             <div class="bg-white rounded-xl shadow-md p-6 md:p-8 mb-10 border border-secondary/10">
-                <div class="mb-4">
-                    <input id="msgName" type="text" maxlength="20" data-i18n-placeholder="msg_name_ph" placeholder="您的昵称"
-                        class="w-full px-4 py-3 border border-secondary/30 rounded-lg focus:outline-none focus:border-primary bg-rice/50">
+                <div class="mb-4 flex items-center justify-between flex-wrap gap-2">
+                    <span class="text-sm text-gray-500" data-i18n="msg_login_status">登录后可发表留言、点赞</span>
+                    <button id="loginBtn" class="text-sm bg-primary/10 text-primary hover:bg-primary/20 px-4 py-1.5 rounded-full transition-colors"></button>
                 </div>
                 <!-- 语言选择 -->
                 <div class="mb-4 flex items-center gap-3">
@@ -499,6 +499,32 @@
                 </audio>
                 <div id="musicDesc"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- 登录/注册弹窗 -->
+    <div id="authModal" style="display:none;position:fixed;inset:0;z-index:15000;background:rgba(0,0,0,0.5);align-items:center;justify-content:center">
+        <div class="bg-white rounded-xl shadow-xl p-8 w-[90%] max-w-md relative">
+            <span id="authClose" class="absolute top-3 right-4 text-gray-400 hover:text-gray-700 cursor-pointer text-2xl">×</span>
+            <h4 class="text-xl font-bold text-primary mb-5" id="authTitle">登录 / 注册</h4>
+            <div class="space-y-3">
+                <input id="authUser" type="text" placeholder="用户名 / 昵称" class="w-full px-4 py-2.5 border border-secondary/30 rounded-lg focus:outline-none focus:border-primary">
+                <input id="authPass" type="password" placeholder="密码" class="w-full px-4 py-2.5 border border-secondary/30 rounded-lg focus:outline-none focus:border-primary">
+            </div>
+            <div class="flex gap-3 mt-5">
+                <button id="authLoginBtn" class="flex-1 bg-primary hover:bg-secondary text-white py-2.5 rounded-lg transition-colors">登录</button>
+                <button id="authRegisterBtn" class="flex-1 bg-accent hover:bg-accent/80 text-white py-2.5 rounded-lg transition-colors">注册</button>
+            </div>
+            <p id="authTip" class="text-sm text-red-500 mt-3 text-center"></p>
+        </div>
+    </div>
+
+    <!-- 管理员面板 -->
+    <div id="adminModal" style="display:none;position:fixed;inset:0;z-index:15001;background:rgba(0,0,0,0.5);align-items:center;justify-content:center">
+        <div class="bg-white rounded-xl shadow-xl p-8 w-[90%] max-w-lg relative">
+            <span id="adminClose" class="absolute top-3 right-4 text-gray-400 hover:text-gray-700 cursor-pointer text-2xl">×</span>
+            <h4 class="text-xl font-bold text-primary mb-4">管理面板</h4>
+            <div id="adminUserList" class="space-y-2 max-h-80 overflow-y-auto"></div>
         </div>
     </div>
 
@@ -1021,106 +1047,57 @@
             if(e.target === musicModal) closeMusicModal();
         })
 
-        // ========== 留言墙数据层（localStorage 客户端数据库） ==========
-        // 种子留言：初始数据，中英双语都填好，likes 是初始赞数
-        const seedMessages = [
-            {id:1, name:"林同学", color:"#A67C52", created_at:"2026-07-15", likes:5,
-             zh:"第一次通过3D模型看清了笙的内部结构，原来自由簧长这样！音乐课上老师讲过但从没见过实物。",
-             en:"First time seeing the internal structure of Sheng through a 3D model! Our music teacher mentioned free reeds in class but I've never seen one."},
-            {id:2, name:"Sophia Chen", color:"#6B8E8E", created_at:"2026-07-22", likes:15,
-             zh:"听到《高山流水》的瞬间眼眶就湿了，在海外五年，这是最想家的一刻。感谢团队做这个网站。",
-             en:"Tears welled up the moment High Mountain Running Water started playing. Five years overseas, this is when I missed home the most. Thank you for building this."},
-            {id:3, name:"王老师", color:"#2F4F4F", created_at:"2026-08-03", likes:12,
-             zh:"中学音乐教研组，已把这个资源链接分享给组里，下学期民乐欣赏课就用你们的资料做课件。",
-             en:"Middle school music teaching group — shared this resource with my colleagues. We'll use it for next semester's folk music appreciation class."},
-            {id:4, name:"Sheng_player", color:"#8B6914", created_at:"2026-08-10", likes:4,
-             zh:"学笙三年，第一次在网页上看到笙的完整结构拆解，加键笙的按键传动系统解释得特别清楚。",
-             en:"Studied Sheng for three years, first time seeing a full structural breakdown online. The key-transmission system explanation is spot on."},
-            {id:5, name:"小筝", color:"#A67C52", created_at:"2026-08-18", likes:3,
-             zh:"答题挑战拿了80分！原来古筝有五大流派，之前只知道浙江筝。宝藏网站，会推荐给琴友群。",
-             en:"Scored 80 on the quiz! Didn't know Guzheng has five major regional schools before. Sharing this with my Guzheng study group."},
-            {id:6, name:"James Morrison", color:"#6B8E8E", created_at:"2026-08-25", likes:10,
-             zh:"通过一部音乐纪录片了解到中国传统乐器。3D古筝模型太迷人了，转着看就像真的捧着一件乐器，现在想深入了解！",
-             en:"Discovered Chinese traditional instruments through a music documentary. The 3D Guzheng model is mesmerizing — rotating it around feels like holding a real instrument. Now I want to learn more!"},
-            {id:7, name:"陈阿姨", color:"#8B6914", created_at:"2026-09-02", likes:7,
-             zh:"带九岁女儿看完《渔舟唱晚》视频，她主动说想学古筝。这个网站最棒的地方是让孩子愿意去了解。",
-             en:"Brought my 9-year-old daughter to watch Fisherman's Song at Dusk — she asked to learn Guzheng afterward. Best part of this site is inspiring kids."},
-            {id:8, name:"民乐研究者", color:"#2F4F4F", created_at:"2026-09-10", likes:8,
-             zh:"曾侯乙墓出土笙那段历史整理得很准确，引用了甲骨文中'和'的记载，比很多教材都详细。",
-             en:"The Zeng-Hou-Yi tomb sheng section is well-researched. The oracle-bone inscription reference to 'He' is more detailed than many textbooks."},
-            {id:9, name:"路人甲", color:"#A67C52", created_at:"2026-09-20", likes:2,
-             zh:"从GitHub Pages误打误撞进来的，本来以为是技术Demo，结果听完《冬猎》循环了一下午。",
-             en:"Stumbled in via GitHub Pages expecting a tech demo, ended up looping Winter Hunt all afternoon."},
-            {id:10, name:"风", color:"#6B8E8E", created_at:"2026-10-05", likes:6,
-             zh:"笙的音色太温柔了，像冬天手捧着一杯热茶。希望以后能加入更多古曲音频。",
-             en:"The Sheng timbre is so gentle, like holding a warm cup of tea in winter. Hope more ancient repertoire audio gets added."}
-        ];
+        // ========== 留言墙数据层（Spring Boot + JWT + MySQL） ==========
+        const API_BASE = 'http://localhost:8080/api/messages';
+        const AUTH_BASE = 'http://localhost:8080/api/auth';
+        let msgCurrentPage = 1;
+        let currentTotal = 0;
 
-        const MSG_PAGE_SIZE = 6;  // 每页显示条数
-        let msgCurrentPage = 1;    // 当前页码
+        const Auth = {
+            token: localStorage.getItem('guzheng_token') || null,
+            nickname: localStorage.getItem('guzheng_nickname') || null,
+            userId: localStorage.getItem('guzheng_userId') || null,
+            role: localStorage.getItem('guzheng_role') || 'user',
+            set(token, nickname, userId, role) {
+                this.token = token; this.nickname = nickname; this.userId = userId; this.role = role || 'user';
+                localStorage.setItem('guzheng_token', token);
+                localStorage.setItem('guzheng_nickname', nickname);
+                localStorage.setItem('guzheng_userId', userId);
+                localStorage.setItem('guzheng_role', this.role);
+            },
+            logout() {
+                this.token = null; this.nickname = null; this.userId = null; this.role = 'user';
+                localStorage.removeItem('guzheng_token');
+                localStorage.removeItem('guzheng_nickname');
+                localStorage.removeItem('guzheng_userId');
+                localStorage.removeItem('guzheng_role');
+            },
+            isAdmin() { return this.role === 'admin'; },
+            authHeader() {
+                return this.token ? { 'Authorization': 'Bearer ' + this.token } : {};
+            }
+        };
 
         const MessageDB = {
-            KEY: 'guzheng_sheng_messages_v1',
-            LIKED_KEY: 'guzheng_sheng_liked_ids_v1',
-            getUserMessages() {
-                try {
-                    const raw = localStorage.getItem(this.KEY);
-                    return raw ? JSON.parse(raw) : [];
-                } catch(e) { return []; }
+            async fetchPage(lang, page) {
+                const res = await fetch(`${API_BASE}?lang=${lang}&page=${page}&size=6`, { headers: Auth.authHeader() });
+                return await res.json();
             },
-            getLikedIds() {
-                try {
-                    const raw = localStorage.getItem(this.LIKED_KEY);
-                    return raw ? JSON.parse(raw) : [];
-                } catch(e) { return []; }
-            },
-            toggleLike(id) {
-                const liked = this.getLikedIds();
-                const idx = liked.indexOf(id);
-                if (idx >= 0) liked.splice(idx, 1);
-                else liked.push(id);
-                try { localStorage.setItem(this.LIKED_KEY, JSON.stringify(liked)); } catch(e){}
-                return idx < 0;  // true = 刚点了赞, false = 刚取消
-            },
-            getAll() {
-                // 合并种子+用户数据，带上当前用户的点赞标记
-                const liked = this.getLikedIds();
-                return [...seedMessages, ...this.getUserMessages()].map(m => ({
-                    ...m,
-                    likes: (m.likes || 0) + (liked.includes(m.id) ? 1 : 0),
-                    liked: liked.includes(m.id)
-                }));
-            },
-            getSortedByLikes() {
-                const liked = this.getLikedIds();
-                // 种子消息：双语，两个语言界面都显示，选当前语言版本
-                const seeds = seedMessages.map(m => ({
-                    ...m,
-                    likes: (m.likes || 0) + (liked.includes(m.id) ? 1 : 0),
-                    liked: liked.includes(m.id),
-                    content: currentLang === 'zh' ? m.zh : m.en
-                }));
-                // 用户消息：单语言，只在对应语言界面显示
-                const users = this.getUserMessages()
-                    .filter(m => m.lang === currentLang)
-                    .map(m => ({
-                        ...m,
-                        likes: (m.likes || 0) + (liked.includes(m.id) ? 1 : 0),
-                        liked: liked.includes(m.id)
-                    }));
-                return [...seeds, ...users].sort((a,b) => {
-                    if (b.likes !== a.likes) return b.likes - a.likes;
-                    return new Date(b.created_at) - new Date(a.created_at);
+            async postMessage(content, lang) {
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', ...Auth.authHeader() },
+                    body: JSON.stringify({ content, lang })
                 });
+                return await res.json();
             },
-            add(msg) {
-                const list = this.getUserMessages();
-                list.unshift(msg);
-                try { localStorage.setItem(this.KEY, JSON.stringify(list)); } catch(e){}
+            async toggleLike(id) {
+                const res = await fetch(`${API_BASE}/${id}/like`, { method: 'POST', headers: Auth.authHeader() });
+                return await res.json();
             },
-            remove(id) {
-                const list = this.getUserMessages().filter(m => m.id !== id);
-                try { localStorage.setItem(this.KEY, JSON.stringify(list)); } catch(e){}
+            async deleteMessage(id) {
+                const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE', headers: Auth.authHeader() });
+                return await res.json();
             }
         };
 
@@ -1130,25 +1107,89 @@
             return div.innerHTML;
         }
 
-        function renderMessages() {
+        function updateLoginUI() {
+            const btn = document.getElementById('loginBtn');
+            if (!btn) return;
+            let adminBtn = document.getElementById('adminBtn');
+            if (Auth.token) {
+                btn.innerHTML = `<i class="fa-solid fa-user"></i> ${escapeHtml(Auth.nickname)} · 退出`;
+                btn.onclick = () => { Auth.logout(); updateLoginUI(); renderMessages(); };
+                if (Auth.isAdmin()) {
+                    if (!adminBtn) {
+                        adminBtn = document.createElement('button');
+                        adminBtn.id = 'adminBtn';
+                        adminBtn.className = 'text-sm bg-red-500/10 text-red-600 hover:bg-red-500/20 px-4 py-1.5 rounded-full transition-colors';
+                        adminBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> 管理面板';
+                        adminBtn.onclick = openAdminPanel;
+                        btn.parentElement.appendChild(adminBtn);
+                    }
+                } else if (adminBtn) { adminBtn.remove(); }
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> 登录 / 注册';
+                btn.onclick = () => { document.getElementById('authModal').style.display = 'flex'; };
+                if (adminBtn) adminBtn.remove();
+            }
+        }
+
+        async function openAdminPanel() {
+            document.getElementById('adminModal').style.display = 'flex';
+            const listEl = document.getElementById('adminUserList');
+            listEl.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">Loading…</p>';
+            try {
+                const res = await fetch('http://localhost:8080/api/auth/users', { headers: Auth.authHeader() });
+                const data = await res.json();
+                if (data.code !== 200) { listEl.innerHTML = `<p class="text-red-400 text-sm text-center">${data.message}</p>`; return; }
+                listEl.innerHTML = data.data.map(u => `
+                    <div class="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2.5">
+                        <div>
+                            <span class="font-medium text-primary">${escapeHtml(u.nickname)}</span>
+                            <span class="text-xs text-gray-400 ml-2">@${escapeHtml(u.username)} · ${u.role}</span>
+                            ${u.banned ? '<span class="text-xs text-red-500 ml-2">[已封禁]</span>' : ''}
+                        </div>
+                        <button class="ban-btn text-sm ${u.banned ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'}" data-id="${u.id}" data-banned="${u.banned}">
+                            ${u.banned ? '解封' : '封禁'}
+                        </button>
+                    </div>`).join('');
+                listEl.querySelectorAll('.ban-btn').forEach(btn => {
+                    btn.onclick = async () => {
+                        const uid = btn.dataset.id;
+                        const newBanned = btn.dataset.banned === '1' ? 0 : 1;
+                        await fetch(`http://localhost:8080/api/auth/users/${uid}/ban?banned=${newBanned}`, { method: 'POST', headers: Auth.authHeader() });
+                        openAdminPanel();
+                    };
+                });
+            } catch(e) {
+                listEl.innerHTML = '<p class="text-red-400 text-sm text-center">网络错误</p>';
+            }
+        }
+
+        async function renderMessages() {
             const listEl = document.getElementById('msgList');
             if (!listEl) return;
-            const all = MessageDB.getSortedByLikes();
+            listEl.innerHTML = '<p class="text-gray-400 text-sm col-span-2 text-center py-8">Loading…</p>';
+            let resp;
+            try {
+                resp = await MessageDB.fetchPage(currentLang, msgCurrentPage);
+            } catch(e) {
+                listEl.innerHTML = '<p class="text-red-400 text-sm col-span-2 text-center py-8">后端未启动，请先运行 Spring Boot</p>';
+                return;
+            }
+            if (resp.code !== 200) {
+                listEl.innerHTML = `<p class="text-red-400 text-sm col-span-2 text-center py-8">${resp.message || '加载失败'}</p>`;
+                return;
+            }
+            const data = resp.data;
+            const list = data.list;
+            currentTotal = data.total;
             const countEl = document.getElementById('msgCount');
-            if (countEl) countEl.textContent = all.length + ' ' + i18n[currentLang].msg_count_label;
+            if (countEl) countEl.textContent = currentTotal + ' ' + i18n[currentLang].msg_count_label;
 
-            // 分页
-            const totalPages = Math.max(1, Math.ceil(all.length / MSG_PAGE_SIZE));
-            if (msgCurrentPage > totalPages) msgCurrentPage = totalPages;
-            const start = (msgCurrentPage - 1) * MSG_PAGE_SIZE;
-            const pageItems = all.slice(start, start + MSG_PAGE_SIZE);
-
-            // 渲染当前页卡片
-            listEl.innerHTML = pageItems.map(m => {
+            listEl.innerHTML = list.map(m => {
                 const initial = escapeHtml((m.name || '?').charAt(0).toUpperCase());
-                const heartClass = m.liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400 group-hover:text-red-400';
-                const isUserMsg = m.id > 1000;  // 种子数据 id 1-10，用户消息是时间戳
-                const delBtn = isUserMsg ? `<button class="del-btn text-gray-300 hover:text-red-500 transition-colors text-sm" data-id="${m.id}" title="删除"><i class="fa-solid fa-trash-can"></i></button>` : '';
+                const liked = m.likedByMe;
+                const heartClass = liked ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400 group-hover:text-red-400';
+                const isMine = m.userId && String(m.userId) === String(Auth.userId);
+                const delBtn = (isMine || Auth.isAdmin()) ? `<button class="del-btn text-gray-300 hover:text-red-500 transition-colors text-sm" data-id="${m.id}" title="删除"><i class="fa-solid fa-trash-can"></i></button>` : '';
                 return `
                 <div class="bg-white rounded-xl shadow p-5 card-hover border border-secondary/10 relative">
                     <div class="absolute top-3 right-3">${delBtn}</div>
@@ -1156,46 +1197,45 @@
                         <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0" style="background:${m.color}">${initial}</div>
                         <div>
                             <div class="font-bold text-primary">${escapeHtml(m.name)}</div>
-                            <div class="text-xs text-gray-500">${m.created_at}</div>
+                            <div class="text-xs text-gray-500">${m.createdAt}</div>
                         </div>
                     </div>
                     <p class="text-gray-700 leading-relaxed text-[15px] mb-4">${escapeHtml(m.content)}</p>
                     <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <button class="like-btn flex items-center gap-2 group" data-id="${m.id}">
-                            <span class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${m.liked ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-400 group-hover:bg-red-50 group-hover:text-red-400'}">
+                        <button class="like-btn flex items-center gap-2 group" data-id="${m.id}" data-liked="${liked}">
+                            <span class="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${liked ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-400 group-hover:bg-red-50 group-hover:text-red-400'}">
                                 <i class="${heartClass} text-base"></i>
                             </span>
-                            <span class="text-sm font-medium ${m.liked ? 'text-red-500' : 'text-gray-500'}">${m.likes}</span>
+                            <span class="text-sm font-medium ${liked ? 'text-red-500' : 'text-gray-500'}">${m.likes}</span>
                         </button>
                     </div>
                 </div>`;
             }).join('');
 
-            // 绑定点赞按钮事件
             listEl.querySelectorAll('.like-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
+                    if (!Auth.token) { alert(currentLang === 'zh' ? '请先登录后再点赞' : 'Please login to like'); document.getElementById('authModal').style.display = 'flex'; return; }
                     const id = Number(btn.dataset.id);
-                    MessageDB.toggleLike(id);
+                    await MessageDB.toggleLike(id);
                     renderMessages();
                 });
             });
 
-            // 绑定删除按钮事件
             listEl.querySelectorAll('.del-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const id = Number(btn.dataset.id);
                     if (confirm('确定删除这条留言？')) {
-                        MessageDB.remove(id);
+                        await MessageDB.deleteMessage(id);
                         renderMessages();
                     }
                 });
             });
 
-            // 渲染分页控件
+            // 后端分页
             const pageEl = document.getElementById('msgPagination');
             if (!pageEl) return;
+            const totalPages = Math.max(1, Math.ceil(currentTotal / 6));
             if (totalPages <= 1) { pageEl.innerHTML = ''; return; }
-
             let html = `<button class="page-btn px-4 py-2 rounded-lg border border-secondary/30 text-sm transition-colors ${msgCurrentPage===1?'opacity-40 cursor-not-allowed':'hover:bg-primary hover:text-white hover:border-primary'}" data-page="${msgCurrentPage-1}" ${msgCurrentPage===1?'disabled':''}>‹ ${i18n[currentLang].page_prev}</button>`;
             for (let i = 1; i <= totalPages; i++) {
                 const active = i === msgCurrentPage;
@@ -1203,22 +1243,18 @@
             }
             html += `<button class="page-btn px-4 py-2 rounded-lg border border-secondary/30 text-sm transition-colors ${msgCurrentPage===totalPages?'opacity-40 cursor-not-allowed':'hover:bg-primary hover:text-white hover:border-primary'}" data-page="${msgCurrentPage+1}" ${msgCurrentPage===totalPages?'disabled':''}>${i18n[currentLang].page_next} ›</button>`;
             pageEl.innerHTML = html;
-
             pageEl.querySelectorAll('.page-btn[data-page]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const p = Number(btn.dataset.page);
-                    if (p >= 1 && p <= totalPages) {
-                        msgCurrentPage = p;
-                        renderMessages();
-                    }
+                    if (p >= 1 && p <= totalPages) { msgCurrentPage = p; renderMessages(); }
                 });
             });
         }
 
-        document.addEventListener('DOMContentLoaded', renderMessages);
+        document.addEventListener('DOMContentLoaded', () => { updateLoginUI(); renderMessages(); });
 
-        // 语言选择按钮
-        let msgLang = currentLang;  // 默认跟随当前界面语言
+        // 语言选择
+        let msgLang = currentLang;
         const langOptZh = document.getElementById('langOptZh');
         const langOptEn = document.getElementById('langOptEn');
         function setMsgLang(lang) {
@@ -1231,38 +1267,62 @@
         langOptZh.addEventListener('click', () => setMsgLang('zh'));
         langOptEn.addEventListener('click', () => setMsgLang('en'));
 
-        document.getElementById('msgSubmit').addEventListener('click', () => {
-            const nameEl = document.getElementById('msgName');
+        document.getElementById('msgSubmit').addEventListener('click', async () => {
+            if (!Auth.token) { alert(currentLang === 'zh' ? '请先登录后再留言' : 'Please login first'); document.getElementById('authModal').style.display = 'flex'; return; }
             const contentEl = document.getElementById('msgContent');
             const tip = document.getElementById('msgFormTip');
-            const name = nameEl.value.trim();
             const content = contentEl.value.trim();
-
-            if (!name || !content) {
+            if (!content) {
                 tip.textContent = i18n[currentLang].msg_empty;
                 tip.className = 'text-sm text-red-500';
                 return;
             }
-
-            const today = new Date().toISOString().slice(0,10);
-            const colors = ['#A67C52','#6B8E8E','#2F4F4F','#8B6914'];
-            const newMsg = {
-                id: Date.now(),
-                name: name,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                created_at: today,
-                likes: 0,
-                content: content,
-                lang: msgLang  // 用用户选的语言，不是当前界面语言
-            };
-            MessageDB.add(newMsg);
-            nameEl.value = '';
+            const resp = await MessageDB.postMessage(content, msgLang);
+            if (resp.code !== 200) {
+                tip.textContent = resp.message || '发表失败';
+                tip.className = 'text-sm text-red-500';
+                return;
+            }
             contentEl.value = '';
             tip.textContent = i18n[currentLang].msg_success;
             tip.className = 'text-sm text-green-600';
             msgCurrentPage = 1;
             renderMessages();
         });
+
+        // ========== 登录/注册弹窗逻辑 ==========
+        async function authSubmit(isRegister) {
+            const username = document.getElementById('authUser').value.trim();
+            const password = document.getElementById('authPass').value.trim();
+            const nickname = username;
+            const tip = document.getElementById('authTip');
+            if (!username || !password) { tip.textContent = '请输入用户名和密码'; return; }
+            try {
+                const url = isRegister ? `${AUTH_BASE}/register` : `${AUTH_BASE}/login`;
+                const body = isRegister ? { username, password, nickname } : { username, password };
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.code === 200) {
+                    Auth.set(data.data.token, data.data.nickname, data.data.userId, data.data.role);
+                    document.getElementById('authModal').style.display = 'none';
+                    tip.textContent = '';
+                    updateLoginUI();
+                    renderMessages();
+                } else {
+                    tip.textContent = data.message || '失败';
+                }
+            } catch(e) {
+                tip.textContent = '网络错误';
+            }
+        }
+        document.getElementById('authLoginBtn').addEventListener('click', () => authSubmit(false));
+        document.getElementById('authRegisterBtn').addEventListener('click', () => authSubmit(true));
+        document.getElementById('authClose').addEventListener('click', () => { document.getElementById('authModal').style.display = 'none'; });
+        document.getElementById('adminClose').addEventListener('click', () => { document.getElementById('adminModal').style.display = 'none'; });
 
         //初始化中文
         applyLang("zh");

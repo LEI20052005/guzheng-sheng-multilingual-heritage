@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.guzheng.mapper.UserMapper">
+
+    <resultMap id="UserMap" type="com.guzheng.entity.User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="passwordHash" column="password_hash"/>
+        <result property="nickname" column="nickname"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="role" column="role"/>
+        <result property="banned" column="banned"/>
+    </resultMap>
+
+    <select id="selectByUsername" resultMap="UserMap">
+        SELECT * FROM users WHERE username = #{username}
+    </select>
+
+    <select id="selectById" resultMap="UserMap">
+        SELECT * FROM users WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.guzheng.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, password_hash, nickname, created_at, role, banned)
+        VALUES (#{username}, #{passwordHash}, #{nickname}, #{createdAt}, 'user', 0)
+    </insert>
+
+    <select id="listAll" resultMap="UserMap">
+        SELECT id, username, nickname, role, banned, created_at FROM users ORDER BY id
+    </select>
+
+    <update id="setBanned">
+        UPDATE users SET banned = #{banned} WHERE id = #{id}
+    </update>
+
+    <update id="updatePassword" parameterType="com.guzheng.entity.User">
+        UPDATE users SET password_hash = #{passwordHash} WHERE id = #{id}
+    </update>
+</mapper>

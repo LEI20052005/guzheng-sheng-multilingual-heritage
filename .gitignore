@@ -141,3 +141,13 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# ===== Java / Maven (backend) =====
+backend/target/
+backend/**/target/
+*.class
+.idea/
+*.iml
+.vscode/
+Thumbs.db
+.DS_Store
