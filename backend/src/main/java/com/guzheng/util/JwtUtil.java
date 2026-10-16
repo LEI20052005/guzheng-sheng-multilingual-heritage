@@ -8,7 +8,9 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET = "guzheng-heritage-secret-key-2026";
+    // JWT 签名密钥：优先从环境变量注入，未配置时使用本地开发默认值
+    private static final String SECRET =
+            System.getenv().getOrDefault("JWT_SECRET", "guzheng-heritage-secret-key-2026");
     private static final long EXPIRE_MS = 7 * 24 * 60 * 60 * 1000L;
 
     public String generate(Long userId, String username) {
